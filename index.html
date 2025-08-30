@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Khalk Store</title>
   <style>
-    /* Ерөнхий theme */
     body {
       margin: 0;
       font-family: "Poppins", Arial, sans-serif;
@@ -40,22 +39,22 @@
 
     .hero {
       text-align: center;
-      padding: 80px 20px;
+      padding: 60px 20px;
       background: linear-gradient(to right, #111, #1a1a1a);
     }
     .hero h1 {
-      font-size: 2.5rem;
-      margin-bottom: 15px;
+      font-size: 2.2rem;
+      margin-bottom: 10px;
       color: #f33;
     }
     .hero p {
-      font-size: 1.2rem;
+      font-size: 1rem;
       color: #aaa;
     }
 
     .products {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
       padding: 40px 20px;
       max-width: 1100px;
@@ -66,12 +65,11 @@
       border: 1px solid #333;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 0 15px rgba(255,255,255,0.05);
       transition: transform 0.3s, box-shadow 0.3s;
     }
     .product:hover {
       transform: translateY(-5px);
-      box-shadow: 0 0 25px rgba(255,0,0,0.4);
+      box-shadow: 0 0 25px rgba(255,0,0,0.3);
     }
     .product img {
       width: 100%;
@@ -80,90 +78,14 @@
     }
     .product-info {
       padding: 15px;
-    }
-    .product-info h3 {
-      margin: 0;
-      font-size: 1.2rem;
-      color: #fff;
+      text-align: center;
     }
     .product-info p {
-      margin: 5px 0;
+      margin: 0;
       color: #f33;
       font-weight: bold;
-    }
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      text-align: center;
-      border-radius: 8px;
-      background: #f33;
-      color: #fff;
-      border: none;
       font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s;
     }
-    .btn:hover {
-      background: #c00;
-    }
-
-    /* Cart panel */
-    .cart-panel {
-      position: fixed;
-      top: 0;
-      right: -100%;
-      width: 320px;
-      height: 100%;
-      background: #111;
-      border-left: 1px solid #333;
-      box-shadow: -5px 0 20px rgba(0,0,0,0.6);
-      transition: right 0.4s ease;
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-    }
-    .cart-panel.active {
-      right: 0;
-    }
-    .cart-header {
-      padding: 15px;
-      font-size: 1.2rem;
-      border-bottom: 1px solid #333;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .cart-items {
-      flex: 1;
-      overflow-y: auto;
-      padding: 15px;
-    }
-    .cart-items p {
-      margin: 8px 0;
-      border-bottom: 1px solid #222;
-      padding-bottom: 5px;
-    }
-    .cart-footer {
-      padding: 15px;
-      border-top: 1px solid #333;
-    }
-    .cart-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #f33;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      color: #fff;
-      font-size: 1.2rem;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 0 20px rgba(255,0,0,0.5);
-    }
-
   </style>
 </head>
 <body>
@@ -178,62 +100,35 @@
 </header>
 
 <section class="hero">
-  <h1>Khalk Store-д тавтай морил!</h1>
-  <p>Орчин үеийн стильтэй хувцас, чанартай сонголтууд.</p>
+  <h1>Khalk Store</h1>
+  <p>Орчин үеийн стильтэй хувцаснууд</p>
 </section>
 
 <section class="products">
+  <!-- Бүтээгдэхүүн 1 -->
   <div class="product">
     <img src="assets/baraa1.png" alt="Hoodie + Baggy Jeans">
     <div class="product-info">
-      <h3>Hoodie + Baggy Jeans</h3>
       <p>₮121,000</p>
-      <button class="btn" onclick="addToCart('Hoodie + Baggy Jeans',121000)">Сагсанд нэмэх</button>
+    </div>
+  </div>
+
+  <!-- Бүтээгдэхүүн 2 -->
+  <div class="product">
+    <img src="assets/baraa2.png" alt="Oversize T-shirt">
+    <div class="product-info">
+      <p>₮45,000</p>
+    </div>
+  </div>
+
+  <!-- Бүтээгдэхүүн 3 -->
+  <div class="product">
+    <img src="assets/baraa3.png" alt="Cargo Pants">
+    <div class="product-info">
+      <p>₮68,000</p>
     </div>
   </div>
 </section>
-
-<!-- Cart Panel -->
-<div class="cart-panel" id="cartPanel">
-  <div class="cart-header">
-    <span>Миний сагс</span>
-    <button onclick="toggleCart()">❌</button>
-  </div>
-  <div class="cart-items" id="cartItems"></div>
-  <div class="cart-footer">
-    <p id="cartTotal">Нийт: ₮0</p>
-    <button class="btn">Төлбөр хийх</button>
-  </div>
-</div>
-
-<!-- Floating Cart Button -->
-<button class="cart-btn" onclick="toggleCart()">🛒</button>
-
-<script>
-let cart = [];
-
-function addToCart(name, price){
-  cart.push({name, price});
-  renderCart();
-  document.getElementById('cartPanel').classList.add("active");
-}
-
-function renderCart(){
-  const itemsEl = document.getElementById('cartItems');
-  const totalEl = document.getElementById('cartTotal');
-  itemsEl.innerHTML = "";
-  let total = 0;
-  cart.forEach((item, i) => {
-    itemsEl.innerHTML += `<p>${item.name} - ₮${item.price}</p>`;
-    total += item.price;
-  });
-  totalEl.textContent = "Нийт: ₮" + total;
-}
-
-function toggleCart(){
-  document.getElementById('cartPanel').classList.toggle("active");
-}
-</script>
 
 </body>
 </html>
