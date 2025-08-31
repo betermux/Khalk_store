@@ -41,14 +41,14 @@ button {
   padding:6px 12px; 
   border:none; 
   border-radius:8px; 
-  background:crimson; 
+  background:#007bff; /* Хөх өнгө, улааныг орлуулсан */
   color:#fff; 
   font-size:13px; 
   cursor:pointer; 
   margin-top:6px;
   transition: transform 0.2s ease, background 0.2s ease;
 }
-button:hover {background:darkred; transform: scale(1.05);}
+button:hover {background:#0056b3; transform: scale(1.05);} /* Хөх өнгөний hover */
 
 .page{display:none;}
 .page.active{display:block;}
@@ -62,19 +62,19 @@ button:hover {background:darkred; transform: scale(1.05);}
   position:absolute; right:-50px; top:50%; transform:translateY(-50%); width:28px; height:28px;
   opacity:0; transition: all 0.3s ease;
 }
-.cart-item:hover{border:2px solid red;}
+.cart-item:hover{border:2px solid #007bff;} /* Улааны оронд хөх хүрээ */
 .cart-item:hover .delete-btn{right:10px; opacity:1;}
 
 /* Slide in */
 @keyframes slideIn {from {opacity:0; transform:translateX(-50px);} to {opacity:1; transform:translateX(0);}}
 
-/* Notification panel - Гоё болгосон */
+/* Notification panel - Ногоон хэвээр */
 #notify {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(45deg, #28a745, #34c759); /* Градиент дэвсгэр */
+  background: linear-gradient(45deg, #28a745, #34c759);
   border: none;
   color: #fff;
   padding: 12px 24px;
@@ -84,47 +84,66 @@ button:hover {background:darkred; transform: scale(1.05);}
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   display: none;
   z-index: 1000;
-  box-shadow: 0 4px 15px rgba(0,255,0,0.3), 0 0 10px rgba(0,255,0,0.2); /* Зөөлөн гэрэл */
+  box-shadow: 0 4px 15px rgba(0,255,0,0.3), 0 0 10px rgba(0,255,0,0.2);
   text-align: center;
 }
 
 @keyframes notifyIn {0% {opacity:0; transform:translate(-50%, -50px);} 100% {opacity:1; transform:translate(-50%, 0);}}
 @keyframes notifyOut {0% {opacity:1; transform:translate(-50%, 0);} 100% {opacity:0; transform:translate(-50%, -50px);}}
 
-/* Add-to-cart button panel - Гоё болгосон */
+/* Add-to-cart button panel - Жижиг болгож, анимац нэмсэн */
 .product-panel {
   position: absolute;
   bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
   display: none;
-  gap: 8px;
+  gap: 6px;
+  animation: panelIn 0.3s ease forwards; /* Panel гарч ирэх анимац */
+}
+.product-panel.hide {
+  animation: panelOut 0.3s ease forwards; /* Panel алга болох анимац */
 }
 .product-panel button {
-  font-size: 13px;
-  padding: 8px 16px;
-  border-radius: 10px;
+  font-size: 12px; /* Жижигрүүлсэн */
+  padding: 6px 12px; /* Жижигрүүлсэн */
+  border-radius: 8px;
   border: none;
-  background: linear-gradient(45deg, #ff4d4d, #ff1a1a); /* Градиент товч */
   color: #fff;
   font-weight: 500;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-  outline: none; /* Цэнхэр хүрээг арилгах */
+  outline: none;
 }
-.product-panel button:hover {
+.product-panel button:nth-child(1) { /* Сагсанд нэмэх */
+  background: #1c1c1c; /* Хар дэвсгэр */
+  border: 2px solid #ff4d4d; /* Улаан outline */
+}
+.product-panel button:nth-child(1):hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(255,0,0,0.3);
+  opacity: 0.9;
+}
+.product-panel button:nth-child(2) { /* Захиалах */
+  background: linear-gradient(45deg, #ff4d4d, #ff1a1a); /* Улаан градиент */
+}
+.product-panel button:nth-child(2):hover {
   transform: scale(1.1);
   box-shadow: 0 2px 8px rgba(255,0,0,0.3);
   opacity: 0.9;
 }
 .product-panel button:focus {
-  outline: none; /* Цэнхэр хүрээг бүрэн арилгах */
+  outline: none;
 }
-.product-panel button:nth-child(2) {
-  background: linear-gradient(45deg, #007bff, #0056b3); /* Захиалах товчны өөр өнгө */
+
+/* Panel in/out animations */
+@keyframes panelIn {
+  from {opacity: 0; transform: translateX(-50%) scale(0.8);}
+  to {opacity: 1; transform: translateX(-50%) scale(1);}
 }
-.product-panel button:nth-child(2):hover {
-  box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+@keyframes panelOut {
+  from {opacity: 1; transform: translateX(-50%) scale(1);}
+  to {opacity: 0; transform: translateX(-50%) scale(0.8);}
 }
 </style>
 </head>
@@ -196,11 +215,19 @@ function backToShop(){
   showPage('productsPage');
 }
 
-// Product panel
+// Product panel with in/out animation
 function showPanel(el){
-  document.querySelectorAll('.product-panel').forEach(p=>p.style.display='none');
+  document.querySelectorAll('.product-panel').forEach(p => {
+    if (p !== el.querySelector('.product-panel')) {
+      p.classList.add('hide');
+      setTimeout(() => p.style.display = 'none', 300); // Wait for animation to finish
+    }
+  });
   const panel = el.querySelector('.product-panel');
-  if(panel) panel.style.display='flex';
+  if (panel) {
+    panel.style.display = 'flex';
+    panel.classList.remove('hide');
+  }
 }
 
 // Add to cart with scale effect
@@ -212,7 +239,10 @@ function addToCart(img, price){
   cart.push({img,price});
   localStorage.setItem("cart", JSON.stringify(cart));
   renderNotification("Бараа сагсанд нэмэгдлээ!");
-  document.querySelectorAll('.product-panel').forEach(p=>p.style.display='none');
+  document.querySelectorAll('.product-panel').forEach(p => {
+    p.classList.add('hide');
+    setTimeout(() => p.style.display = 'none', 300); // Wait for animation to finish
+  });
 }
 
 // Render cart
