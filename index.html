@@ -29,7 +29,14 @@ header img.cart{width:28px;height:28px;cursor:pointer;}
   cursor:pointer; 
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow:hidden;
+  opacity: 0; /* Анимацын эхлэл */
+  transform: translateY(20px); /* Доошоо бага зэрэг */
+  animation: productFadeIn 0.5s ease forwards; /* Барааны анимац */
 }
+.product:nth-child(1) {animation-delay: 0.1s;}
+.product:nth-child(2) {animation-delay: 0.2s;}
+.product:nth-child(3) {animation-delay: 0.3s;}
+/* Дараагийн бараануудад delay нэмэх боломжтой */
 .product img {
   width:100%; 
   border-radius:12px; 
@@ -68,17 +75,23 @@ button:hover {background:#0056b3; transform: scale(1.05);}
 .cart-item:hover{border:2px solid #007bff;}
 .cart-item:hover .delete-btn{right:10px; opacity:1;}
 
-/* Slide in */
+/* Slide in for cart items */
 @keyframes slideIn {from {opacity:0; transform:translateX(-50px);} to {opacity:1; transform:translateX(0);}}
 
-/* Notification panel */
+/* Product fade-in animation */
+@keyframes productFadeIn {
+  from {opacity: 0; transform: translateY(20px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+/* Notification panel - Хар дэвсгэр, ногоон outline */
 #notify {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(45deg, #28a745, #34c759);
-  border: none;
+  background: #1c1c1c; /* Хар дэвсгэр */
+  border: 2px solid #28a745; /* Ногоон outline */
   color: #fff;
   padding: 12px 24px;
   border-radius: 10px;
@@ -87,7 +100,7 @@ button:hover {background:#0056b3; transform: scale(1.05);}
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   display: none;
   z-index: 1000;
-  box-shadow: 0 4px 15px rgba(0,255,0,0.3), 0 0 10px rgba(0,255,0,0.2);
+  width: 300px; /* Илүү өргөн */
   text-align: center;
 }
 
@@ -163,7 +176,7 @@ button:hover {background:#0056b3; transform: scale(1.05);}
 <!-- Products Page -->
 <div id="productsPage" class="page active">
   <div class="products">
-    <div class="product" onclick="showPanel(this)">
+    <div class="product">
       <img src="assets/baraa1.png" alt="Baraa1">
       <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
       <div class="product-panel">
@@ -171,7 +184,7 @@ button:hover {background:#0056b3; transform: scale(1.05);}
         <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
       </div>
     </div>
-    <div class="product" onclick="showPanel(this)">
+    <div class="product">
       <img src="assets/baraa2.png" alt="Baraa2">
       <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
       <div class="product-panel">
@@ -179,7 +192,7 @@ button:hover {background:#0056b3; transform: scale(1.05);}
         <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
       </div>
     </div>
-    <div class="product" onclick="showPanel(this)">
+    <div class="product">
       <img src="assets/baraa3.png" alt="Baraa3">
       <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
@@ -224,7 +237,7 @@ function showPanel(el){
   document.querySelectorAll('.product-panel').forEach(p => {
     if (p !== el.querySelector('.product-panel') && !p.classList.contains('hide')) {
       p.classList.add('hide');
-      setTimeout(() => p.style.display = 'none', 300); // Wait for animation to finish
+      setTimeout(() => p.style.display = 'none', 300);
     }
   });
   const panel = el.querySelector('.product-panel');
@@ -290,7 +303,7 @@ function renderNotification(msg){
 
 // Order placeholder
 function openOrder(){
-  alert("Захиалга хийх popup"); // Firebase order кодыг энд ашиглаж болно
+  alert("Захиалга хийх popup");
 }
 
 // Hide panel only when clicking on another product
@@ -299,7 +312,6 @@ document.addEventListener('click', (event) => {
   const isProduct = clickedElement.closest('.product');
   const isPanelButton = clickedElement.closest('.product-panel button');
   if (!isProduct && !isPanelButton) {
-    // Do not hide panel when clicking outside products
     return;
   }
   if (isProduct) {
