@@ -7,11 +7,10 @@
 <style>
 body {margin:0; padding:0; font-family:Arial,sans-serif; background:#111; color:#eee;}
 header {padding:15px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #222;}
-header .logo-section {display:flex; align-items:center; gap:10px;}
 header img.logo{width:40px;height:40px;}
-header img.home{width:28px;height:28px;cursor:pointer;}
+header img.cart{width:28px;height:28px;cursor:pointer;}
 
-/* Products grid */
+/* Products grid like Shopify */
 .products {
   display: grid;
   grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
@@ -25,11 +24,11 @@ header img.home{width:28px;height:28px;cursor:pointer;}
   text-align:center; 
   position:relative; 
   cursor:pointer; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow:hidden;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-.product img{width:100%; border-radius:12px; transition: transform 0.25s ease;}
-.product:hover{transform: scale(1.05);}
+.product img{width:100%; border-radius:12px; transition: transform 0.3s ease;}
+.product:hover img{transform: translateX(10px);} /* right slide on hover */
 .price {margin-top:8px; font-size:14px;}
 .old-price{text-decoration:line-through;color:#999;margin-left:4px;}
 button{padding:6px 12px; border:none; border-radius:8px; background:crimson; color:#fff; font-size:13px; cursor:pointer; margin-top:6px;}
@@ -74,20 +73,14 @@ button:hover{background:darkred;}
 @keyframes notifyIn {0% {opacity:0; transform:translate(-50%, -50px);} 100% {opacity:1; transform:translate(-50%, 0);}}
 @keyframes notifyOut {0% {opacity:1; transform:translate(-50%, 0);} 100% {opacity:0; transform:translate(-50%, -50px);}}
 
-/* Product panel */
+/* Add-to-cart button panel */
 .product-panel {
   position: absolute;
-  bottom:6px;
-  left:50%;
-  transform: translateX(-50%) translateY(20px);
-  display:flex;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  display:none;
   gap:6px;
-  opacity:0;
-  transition: all 0.25s ease;
-}
-.product:hover .product-panel{
-  transform: translateX(-50%) translateY(0);
-  opacity:1;
 }
 .product-panel button {
   font-size:12px; padding:4px 8px;
@@ -97,17 +90,16 @@ button:hover{background:darkred;}
 <body>
 
 <header>
-  <div class="logo-section">
+  <div style="display:flex;align-items:center;gap:10px;">
     <img src="assets/khalk.png" class="logo" alt="Logo">
-    <span>Khalk Store</span>
   </div>
-  <img src="assets/home.png" class="home" alt="Home" onclick="backToShop()">
+  <img src="assets/cart.png" class="cart" alt="Cart" onclick="openCart()">
 </header>
 
 <!-- Products Page -->
 <div id="productsPage" class="page active">
   <div class="products">
-    <div class="product">
+    <div class="product" onclick="showPanel(this)">
       <img src="assets/baraa1.png" alt="Baraa1">
       <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
       <div class="product-panel">
@@ -115,7 +107,7 @@ button:hover{background:darkred;}
         <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
       </div>
     </div>
-    <div class="product">
+    <div class="product" onclick="showPanel(this)">
       <img src="assets/baraa2.png" alt="Baraa2">
       <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
       <div class="product-panel">
@@ -123,7 +115,7 @@ button:hover{background:darkred;}
         <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
       </div>
     </div>
-    <div class="product">
+    <div class="product" onclick="showPanel(this)">
       <img src="assets/baraa3.png" alt="Baraa3">
       <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
@@ -138,6 +130,7 @@ button:hover{background:darkred;}
 <div id="cartPage" class="page cart-page">
   <div id="cartItems"></div>
   <div class="cart-empty" id="cartEmpty">Сагс хоосон байна</div>
+  <button onclick="backToShop()">⇦ Дэлгүүр рүү буцах</button>
 </div>
 
 <!-- Notification -->
@@ -146,11 +139,13 @@ button:hover{background:darkred;}
 <script>
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
+// Show page
 function showPage(pageId){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
 }
 
+// Cart page
 function openCart(){
   showPage('cartPage');
   renderCart();
@@ -160,6 +155,14 @@ function backToShop(){
   showPage('productsPage');
 }
 
+// Product panel
+function showPanel(el){
+  document.querySelectorAll('.product-panel').forEach(p=>p.style.display='none');
+  const panel = el.querySelector('.product-panel');
+  if(panel) panel.style.display='flex';
+}
+
+// Add to cart with scale effect
 function addToCart(img, price){
   const productEl = document.querySelectorAll('.product img[src="'+img+'"]')[0].parentElement;
   productEl.style.transform = 'scale(1.05)';
@@ -168,8 +171,10 @@ function addToCart(img, price){
   cart.push({img,price});
   localStorage.setItem("cart", JSON.stringify(cart));
   renderNotification("Бараа сагсанд нэмэгдлээ!");
+  document.querySelectorAll('.product-panel').forEach(p=>p.style.display='none');
 }
 
+// Render cart
 function renderCart(){
   const container = document.getElementById("cartItems");
   const empty = document.getElementById("cartEmpty");
@@ -179,6 +184,7 @@ function renderCart(){
     empty.style.display = "block";
     return;
   }
+  
   empty.style.display = "none";
   
   cart.forEach((item,index)=>{
@@ -190,12 +196,14 @@ function renderCart(){
   });
 }
 
+// Delete item
 function deleteItem(index){
   cart.splice(index,1);
   localStorage.setItem("cart", JSON.stringify(cart));
   renderCart();
 }
 
+// Notification animation
 function renderNotification(msg){
   const notify = document.getElementById("notify");
   notify.innerText = msg;
@@ -205,8 +213,9 @@ function renderNotification(msg){
   setTimeout(()=>{ notify.style.display="none"; }, 1800);
 }
 
+// Order placeholder
 function openOrder(){
-  alert("Захиалга хийх popup"); 
+  alert("Захиалга хийх popup"); // Firebase order кодыг энд ашиглаж болно
 }
 </script>
 
