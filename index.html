@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Khalk Store</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet"> <!-- Сонгодог фонт -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
 <style>
 body {margin:0; padding:0; font-family:Arial,sans-serif; background:#111; color:#eee;}
 header {padding:15px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #222;}
@@ -36,6 +36,7 @@ header img.cart{width:28px;height:28px;cursor:pointer;}
 .product:nth-child(1) {animation-delay: 0.1s;}
 .product:nth-child(2) {animation-delay: 0.2s;}
 .product:nth-child(3) {animation-delay: 0.3s;}
+.product:nth-child(4) {animation-delay: 0.4s;} /* Шинэ барааны хувьд */
 .product img {
   width:100%; 
   border-radius:12px; 
@@ -196,6 +197,14 @@ button:hover {background:#0056b3; transform: scale(1.05);}
       <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
         <button onclick="event.stopPropagation(); addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa4.png" alt="Baraa4">
+      <div class="price">₮154,000 <span class="old-price">₮214,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa4.png','₮154,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
       </div>
     </div>
