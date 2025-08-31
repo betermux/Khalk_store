@@ -5,194 +5,109 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Khalk Store</title>
 <style>
-body {
-  margin: 0; padding: 0; font-family: Arial, sans-serif;
-  background: #111; color: #eee;
-}
-header {
-  padding: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;
-  border-bottom: 1px solid #222;
-}
-header img {width:40px; height:40px;}
-header h1 {font-size: 20px; font-weight: 600;}
+body {margin:0; padding:0; font-family:Arial,sans-serif; background:#111; color:#eee;}
+header {padding:15px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #222;}
+header img.logo{width:40px;height:40px;}
+header img.cart{width:28px;height:28px;cursor:pointer;}
 
-.products {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-  padding: 20px;
-  max-width: 900px;
-  margin: auto;
-}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;padding:20px;}
+.product {background:#1c1c1c; border-radius:12px; padding:15px; text-align:center;}
+.product img{width:100%; border-radius:12px;}
+.price {margin-top:10px; font-size:16px;}
+.old-price{text-decoration:line-through;color:#999;margin-left:6px;}
+button{padding:8px 16px; border:none; border-radius:8px; background:crimson; color:#fff; font-size:15px; cursor:pointer; margin-top:8px;}
+button:hover{background:darkred;}
 
-.product {
-  background: #1c1c1c; border-radius: 12px; padding: 12px;
-  text-align: center; transition: transform .2s;
-}
-.product:hover {transform: translateY(-4px);}
-.product img {
-  width: 100%; border-radius: 10px; margin-bottom: 8px;
-}
-.price {
-  font-size: 16px; font-weight: bold; color: #fff;
-}
-.old-price {
-  font-size: 14px; color: #888; text-decoration: line-through; margin-left: 6px;
-}
-button {
-  padding: 8px 16px; border: none; border-radius: 8px;
-  background: crimson; color: #fff; font-size: 15px; cursor: pointer;
-  margin-top: 8px;
-}
-button:hover {background: darkred;}
+.page{display:none;}
+.page.active{display:block;}
 
-/* Захиалга Panel */
-.overlay {
-  position: fixed; top:0; left:0; right:0; bottom:0;
-  background: rgba(0,0,0,0.6); display:none;
-  align-items: center; justify-content: center; padding: 10px;
-}
-.panel {
-  background:#222; padding:20px; border-radius:12px;
-  width:100%; max-width:400px; text-align:left;
-  animation: slideUp 0.3s ease;
-}
-@keyframes slideUp {from {transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;}}
-input,textarea {
-  width:100%; margin:8px 0; padding:10px;
-  border-radius:6px; border:none; background:#333; color:#eee;
-}
+/* Cart */
+.cart-page{padding:20px;}
+.cart-item{background:#1c1c1c; border-radius:12px; padding:15px; margin-bottom:10px; display:flex; align-items:center; gap:10px;}
+.cart-item img{width:60px;border-radius:8px;}
+.cart-empty{text-align:center;margin-top:50px;color:#888;font-size:18px;}
 
-/* Success message */
-.success-msg {
-  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-  background: #28a745; color: #fff; padding: 12px 20px;
-  border-radius: 8px; display: none; font-size: 15px;
-  animation: fadeSlide 2s ease forwards;
-}
-@keyframes fadeSlide {
-  0% {opacity:0; transform: translate(-50%, -20px);}
-  10% {opacity:1; transform: translate(-50%, 0);}
-  90% {opacity:1; transform: translate(-50%, 0);}
-  100% {opacity:0; transform: translate(-50%, -20px);}
-}
 </style>
 </head>
 <body>
 
 <header>
-  <img src="assets/khalk.png" alt="Logo">
-  <h1>Khalk Store</h1>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <img src="assets/khalk.png" class="logo" alt="Logo">
+    <h1 style="font-size:20px;">Khalk Store</h1>
+  </div>
+  <img src="assets/cart.png" class="cart" alt="Cart" onclick="openCart()">
 </header>
 
-<div class="products">
-  <div class="product">
-    <img src="assets/baraa1.png" alt="Product 1">
-    <div>
-      <span class="price">₮121,000</span>
-      <span class="old-price">₮149,000</span>
+<!-- Products Page -->
+<div id="productsPage" class="page active">
+  <div class="products">
+    <div class="product">
+      <img src="assets/baraa1.png" alt="Baraa1">
+      <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
+      <button onclick="addToCart('assets/baraa1.png','₮121,000')">Сагсанд нэмэх</button>
     </div>
-    <button onclick="openOrder('₮121,000')">Захиалах</button>
-  </div>
-
-  <div class="product">
-    <img src="assets/baraa2.png" alt="Product 2">
-    <div>
-      <span class="price">₮177,000</span>
-      <span class="old-price">₮199,000</span>
+    <div class="product">
+      <img src="assets/baraa2.png" alt="Baraa2">
+      <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
+      <button onclick="addToCart('assets/baraa2.png','₮177,000')">Сагсанд нэмэх</button>
     </div>
-    <button onclick="openOrder('₮177,000')">Захиалах</button>
-  </div>
-
-  <div class="product">
-    <img src="assets/baraa3.png" alt="Product 3">
-    <div>
-      <span class="price">₮153,000</span>
-      <span class="old-price">₮179,000</span>
+    <div class="product">
+      <img src="assets/baraa3.png" alt="Baraa3">
+      <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
+      <button onclick="addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
     </div>
-    <button onclick="openOrder('₮153,000')">Захиалах</button>
   </div>
 </div>
 
-<!-- Захиалга panel -->
-<div class="overlay" id="orderOverlay">
-  <div class="panel">
-    <h3>Захиалга хийх</h3>
-    <input type="text" id="name" placeholder="Нэр">
-    <input type="text" id="phone" placeholder="Утас">
-    <textarea id="address" placeholder="Дэлгэрэнгүй хаяг"></textarea>
-    <p><b>Гүйлгээний утга:</b> <span id="orderCode"></span></p>
-    <button onclick="submitOrder()">Захиалгаа баталгаажуулах</button>
-    <button onclick="closeOrder()">Хаах</button>
-  </div>
+<!-- Cart Page -->
+<div id="cartPage" class="page cart-page">
+  <h2>🛒 Миний сагс</h2>
+  <div id="cartItems"></div>
+  <div class="cart-empty" id="cartEmpty">Сагс хоосон байна</div>
+  <button onclick="backToShop()">⇦ Дэлгүүр рүү буцах</button>
 </div>
 
-<!-- Success message -->
-<div id="successMessage" class="success-msg">Захиалга амжилттай!</div>
+<script>
+let cart = [];
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAEybA-Ou_PGkZINDT-opzVPUlrr6XOU8E",
-  authDomain: "khalkh-store.firebaseapp.com",
-  databaseURL: "https://khalkh-store-default-rtdb.firebaseio.com",
-  projectId: "khalkh-store",
-  storageBucket: "khalkh-store.appspot.com",
-  messagingSenderId: "205879441792",
-  appId: "1:205879441792:web:677a6abe7912d6436a2965",
-  measurementId: "G-6M9HZM8G9N"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-function generateUniqueCode(){
-  return Math.floor(100000000 + Math.random()*900000000).toString();
+function showPage(pageId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
 }
 
-let currentPrice = "";
-
-window.openOrder = function(price){
-  document.getElementById("orderOverlay").style.display = "flex";
-  document.getElementById("orderCode").innerText = generateUniqueCode();
-  currentPrice = price;
+function openCart(){
+  showPage('cartPage');
+  renderCart();
 }
 
-window.closeOrder = function(){
-  document.getElementById("orderOverlay").style.display = "none";
+function backToShop(){
+  showPage('productsPage');
 }
 
-window.submitOrder = function(){
-  const name = document.getElementById("name").value;
-  const phone = document.getElementById("phone").value;
-  const address = document.getElementById("address").value;
-  const orderCode = document.getElementById("orderCode").innerText;
+function addToCart(img, price){
+  cart.push({img,price});
+  alert("Бараа сагсанд нэмэгдлээ!");
+}
 
-  if(!name || !phone || !address){
-    alert("Бүх талбарыг бөглөнө үү!");
+function renderCart(){
+  const container = document.getElementById("cartItems");
+  const empty = document.getElementById("cartEmpty");
+  container.innerHTML = "";
+  
+  if(cart.length === 0){
+    empty.style.display = "block";
     return;
   }
-
-  const ordersRef = ref(db,"orders");
-  const newOrderRef = push(ordersRef);
-  set(newOrderRef,{
-    code: orderCode,
-    name: name,
-    phone: phone,
-    address: address,
-    price: currentPrice,
-    paid: false,
-    createdAt: new Date().toISOString()
+  
+  empty.style.display = "none";
+  
+  cart.forEach(item=>{
+    const div = document.createElement("div");
+    div.className = "cart-item";
+    div.innerHTML = `<img src="${item.img}"><div>${item.price}</div>`;
+    container.appendChild(div);
   });
-
-  // Success message гаргах
-  const msg = document.getElementById("successMessage");
-  msg.style.display = "block";
-  setTimeout(()=>{ msg.style.display="none"; }, 2000);
-
-  closeOrder();
 }
 </script>
 
