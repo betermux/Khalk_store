@@ -56,14 +56,8 @@ button:hover{background:darkred;}
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-@keyframes notifyIn {
-  0% {opacity:0; transform:translate(-50%, -50px);}
-  100% {opacity:1; transform:translate(-50%, 0);}
-}
-@keyframes notifyOut {
-  0% {opacity:1; transform:translate(-50%, 0);}
-  100% {opacity:0; transform:translate(-50%, -50px);}
-}
+@keyframes notifyIn {0% {opacity:0; transform:translate(-50%, -50px);} 100% {opacity:1; transform:translate(-50%, 0);}}
+@keyframes notifyOut {0% {opacity:1; transform:translate(-50%, 0);} 100% {opacity:0; transform:translate(-50%, -50px);}}
 
 /* Add-to-cart button panel */
 .product-panel {
@@ -154,10 +148,10 @@ function showPanel(el){
   if(panel) panel.style.display='flex';
 }
 
-// Add to cart
+// Add to cart with scale effect
 function addToCart(img, price){
   const productEl = document.querySelectorAll('.product img[src="'+img+'"]')[0].parentElement;
-  productEl.style.transform = 'scale(1.1)';
+  productEl.style.transform = 'scale(1.05)';
   setTimeout(()=>{ productEl.style.transform='scale(1)'; },300);
 
   cart.push({img,price});
@@ -207,9 +201,8 @@ function renderNotification(msg){
 
 // Order placeholder
 function openOrder(){
-  alert("Захиалга хийх popup"); // Таны Firebase order кодыг энд ашиглаж болно
+  alert("Захиалга хийх popup"); // Firebase order кодыг энд ашиглаж болно
 }
-
 </script>
 
 </body>
