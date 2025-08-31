@@ -6,91 +6,75 @@
 <title>Khalk Store</title>
 <style>
 body {
-  margin:0; padding:0;
-  font-family:Arial,sans-serif;
-  background:#111; color:#eee;
+  margin: 0; padding: 0; font-family: Arial, sans-serif;
+  background: #111; color: #eee;
 }
 header {
-  padding:15px;
-  display:flex; align-items:center; justify-content:center; gap:10px;
-  border-bottom:1px solid #222;
+  padding: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;
+  border-bottom: 1px solid #222;
 }
-header img {width:40px;height:40px;}
-header h1 {font-size:20px; font-weight:bold;}
+header img {width:40px; height:40px;}
+header h1 {font-size: 20px; font-weight: 600;}
 
-.container {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:20px;
-  padding:20px;
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
 }
 
 .product {
-  background:#1c1c1c;
-  border-radius:12px;
-  overflow:hidden;
-  text-align:center;
-  padding:15px;
-  transition:transform .2s ease;
+  background: #1c1c1c; border-radius: 12px; padding: 12px;
+  text-align: center; transition: transform .2s;
 }
-.product:hover {transform:translateY(-5px);}
+.product:hover {transform: translateY(-4px);}
 .product img {
-  width:100%; border-radius:10px; margin-bottom:10px;
+  width: 100%; border-radius: 10px; margin-bottom: 8px;
 }
 .price {
-  font-size:16px; margin:5px 0;
+  font-size: 16px; font-weight: bold; color: #fff;
 }
 .old-price {
-  text-decoration:line-through;
-  color:#888; margin-right:8px;
-}
-.new-price {
-  color:crimson; font-weight:bold; font-size:18px;
+  font-size: 14px; color: #888; text-decoration: line-through; margin-left: 6px;
 }
 button {
-  padding:10px 20px;
-  border:none; border-radius:8px;
-  background:crimson; color:#fff;
-  font-size:14px; cursor:pointer;
-  margin-top:10px;
+  padding: 8px 16px; border: none; border-radius: 8px;
+  background: crimson; color: #fff; font-size: 15px; cursor: pointer;
+  margin-top: 8px;
 }
-button:hover {background:darkred;}
+button:hover {background: darkred;}
 
-/* Success notification */
-.notification {
-  position:fixed;
-  top:20px; left:50%;
-  transform:translateX(-50%);
-  background:#28a745;
-  color:#fff;
-  padding:12px 20px;
-  border-radius:8px;
-  font-size:15px;
-  display:none;
-  animation:fadeSlide 0.5s ease;
-}
-@keyframes fadeSlide {
-  from {opacity:0; transform:translate(-50%, -20px);}
-  to {opacity:1; transform:translate(-50%, 0);}
-}
-
+/* Захиалга Panel */
 .overlay {
-  position:fixed; top:0; left:0; right:0; bottom:0;
-  background:rgba(0,0,0,0.6);
-  display:none; align-items:center; justify-content:center; padding:10px;
+  position: fixed; top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.6); display:none;
+  align-items: center; justify-content: center; padding: 10px;
 }
 .panel {
   background:#222; padding:20px; border-radius:12px;
   width:100%; max-width:400px; text-align:left;
-  animation:slideUp 0.3s ease;
+  animation: slideUp 0.3s ease;
 }
-@keyframes slideUp {
-  from {transform:translateY(30px); opacity:0;}
-  to{transform:translateY(0); opacity:1;}
-}
-input,textarea{
+@keyframes slideUp {from {transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+input,textarea {
   width:100%; margin:8px 0; padding:10px;
   border-radius:6px; border:none; background:#333; color:#eee;
+}
+
+/* Success message */
+.success-msg {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: #28a745; color: #fff; padding: 12px 20px;
+  border-radius: 8px; display: none; font-size: 15px;
+  animation: fadeSlide 2s ease forwards;
+}
+@keyframes fadeSlide {
+  0% {opacity:0; transform: translate(-50%, -20px);}
+  10% {opacity:1; transform: translate(-50%, 0);}
+  90% {opacity:1; transform: translate(-50%, 0);}
+  100% {opacity:0; transform: translate(-50%, -20px);}
 }
 </style>
 </head>
@@ -101,18 +85,33 @@ input,textarea{
   <h1>Khalk Store</h1>
 </header>
 
-<div class="container">
-  <!-- Product 1 -->
+<div class="products">
   <div class="product">
-    <img src="assets/baraa1.png" alt="Hoodie + Baggy Jeans">
-    <div class="price">
-      <span class="old-price">₮150,000</span>
-      <span class="new-price">₮121,000</span>
+    <img src="assets/baraa1.png" alt="Product 1">
+    <div>
+      <span class="price">₮121,000</span>
+      <span class="old-price">₮149,000</span>
     </div>
-    <button onclick="openOrder('Hoodie + Baggy Jeans', '₮121,000')">Захиалах</button>
+    <button onclick="openOrder('₮121,000')">Захиалах</button>
   </div>
 
-  <!-- Дараа нь өөр бараануудыг ийм загвараар нэмээд явна -->
+  <div class="product">
+    <img src="assets/baraa2.png" alt="Product 2">
+    <div>
+      <span class="price">₮177,000</span>
+      <span class="old-price">₮199,000</span>
+    </div>
+    <button onclick="openOrder('₮177,000')">Захиалах</button>
+  </div>
+
+  <div class="product">
+    <img src="assets/baraa3.png" alt="Product 3">
+    <div>
+      <span class="price">₮153,000</span>
+      <span class="old-price">₮179,000</span>
+    </div>
+    <button onclick="openOrder('₮153,000')">Захиалах</button>
+  </div>
 </div>
 
 <!-- Захиалга panel -->
@@ -122,20 +121,19 @@ input,textarea{
     <input type="text" id="name" placeholder="Нэр">
     <input type="text" id="phone" placeholder="Утас">
     <textarea id="address" placeholder="Дэлгэрэнгүй хаяг"></textarea>
-    <input type="hidden" id="productName">
-    <input type="hidden" id="productPrice">
+    <p><b>Гүйлгээний утга:</b> <span id="orderCode"></span></p>
     <button onclick="submitOrder()">Захиалгаа баталгаажуулах</button>
     <button onclick="closeOrder()">Хаах</button>
   </div>
 </div>
 
-<div class="notification" id="notify">Захиалга амжилттай!</div>
+<!-- Success message -->
+<div id="successMessage" class="success-msg">Захиалга амжилттай!</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// Firebase тохиргоо
 const firebaseConfig = {
   apiKey: "AIzaSyAEybA-Ou_PGkZINDT-opzVPUlrr6XOU8E",
   authDomain: "khalkh-store.firebaseapp.com",
@@ -154,10 +152,12 @@ function generateUniqueCode(){
   return Math.floor(100000000 + Math.random()*900000000).toString();
 }
 
-window.openOrder = function(product, price){
+let currentPrice = "";
+
+window.openOrder = function(price){
   document.getElementById("orderOverlay").style.display = "flex";
-  document.getElementById("productName").value = product;
-  document.getElementById("productPrice").value = price;
+  document.getElementById("orderCode").innerText = generateUniqueCode();
+  currentPrice = price;
 }
 
 window.closeOrder = function(){
@@ -168,9 +168,7 @@ window.submitOrder = function(){
   const name = document.getElementById("name").value;
   const phone = document.getElementById("phone").value;
   const address = document.getElementById("address").value;
-  const product = document.getElementById("productName").value;
-  const price = document.getElementById("productPrice").value;
-  const orderCode = generateUniqueCode();
+  const orderCode = document.getElementById("orderCode").innerText;
 
   if(!name || !phone || !address){
     alert("Бүх талбарыг бөглөнө үү!");
@@ -184,22 +182,17 @@ window.submitOrder = function(){
     name: name,
     phone: phone,
     address: address,
-    product: product,
-    price: price,
+    price: currentPrice,
     paid: false,
     createdAt: new Date().toISOString()
   });
 
-  showNotification("Захиалга амжилттай! Код: "+orderCode);
-  closeOrder();
-}
+  // Success message гаргах
+  const msg = document.getElementById("successMessage");
+  msg.style.display = "block";
+  setTimeout(()=>{ msg.style.display="none"; }, 2000);
 
-// Notification харуулах
-function showNotification(msg){
-  const notify = document.getElementById("notify");
-  notify.innerText = msg;
-  notify.style.display = "block";
-  setTimeout(()=>{ notify.style.display="none"; },3000);
+  closeOrder();
 }
 </script>
 
