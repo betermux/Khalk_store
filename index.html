@@ -29,14 +29,13 @@ header img.cart{width:28px;height:28px;cursor:pointer;}
   cursor:pointer; 
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow:hidden;
-  opacity: 0; /* Анимацын эхлэл */
-  transform: translateY(20px); /* Доошоо бага зэрэг */
-  animation: productFadeIn 0.5s ease forwards; /* Барааны анимац */
+  opacity: 0;
+  transform: translateY(20px);
+  animation: productFadeIn 0.5s ease forwards;
 }
 .product:nth-child(1) {animation-delay: 0.1s;}
 .product:nth-child(2) {animation-delay: 0.2s;}
 .product:nth-child(3) {animation-delay: 0.3s;}
-/* Дараагийн бараануудад delay нэмэх боломжтой */
 .product img {
   width:100%; 
   border-radius:12px; 
@@ -84,14 +83,14 @@ button:hover {background:#0056b3; transform: scale(1.05);}
   to {opacity: 1; transform: translateY(0);}
 }
 
-/* Notification panel - Хар дэвсгэр, ногоон outline */
+/* Notification panel */
 #notify {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: #1c1c1c; /* Хар дэвсгэр */
-  border: 2px solid #28a745; /* Ногоон outline */
+  background: #1c1c1c;
+  border: 2px solid #28a745;
   color: #fff;
   padding: 12px 24px;
   border-radius: 10px;
@@ -100,7 +99,7 @@ button:hover {background:#0056b3; transform: scale(1.05);}
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   display: none;
   z-index: 1000;
-  width: 300px; /* Илүү өргөн */
+  width: 300px;
   text-align: center;
 }
 
@@ -115,10 +114,14 @@ button:hover {background:#0056b3; transform: scale(1.05);}
   transform: translateX(-50%);
   display: none;
   gap: 6px;
-  animation: panelIn 0.3s ease forwards;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.product-panel.hide {
-  animation: panelOut 0.3s ease forwards;
+.product:hover .product-panel {
+  display: flex;
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+  animation: panelIn 0.3s ease forwards;
 }
 .product-panel button {
   font-size: 12px;
@@ -156,10 +159,6 @@ button:hover {background:#0056b3; transform: scale(1.05);}
 @keyframes panelIn {
   from {opacity: 0; transform: translateX(-50%) scale(0.8);}
   to {opacity: 1; transform: translateX(-50%) scale(1);}
-}
-@keyframes panelOut {
-  from {opacity: 1; transform: translateX(-50%) scale(1);}
-  to {opacity: 0; transform: translateX(-50%) scale(0.8);}
 }
 </style>
 </head>
@@ -232,21 +231,6 @@ function backToShop(){
   showPage('productsPage');
 }
 
-// Product panel with in/out animation
-function showPanel(el){
-  document.querySelectorAll('.product-panel').forEach(p => {
-    if (p !== el.querySelector('.product-panel') && !p.classList.contains('hide')) {
-      p.classList.add('hide');
-      setTimeout(() => p.style.display = 'none', 300);
-    }
-  });
-  const panel = el.querySelector('.product-panel');
-  if (panel) {
-    panel.style.display = 'flex';
-    panel.classList.remove('hide');
-  }
-}
-
 // Add to cart with scale effect
 function addToCart(img, price){
   const productEl = document.querySelectorAll('.product img[src="'+img+'"]')[0].parentElement;
@@ -256,10 +240,6 @@ function addToCart(img, price){
   cart.push({img, price});
   localStorage.setItem("cart", JSON.stringify(cart));
   renderNotification("Бараа сагсанд нэмэгдлээ!");
-  document.querySelectorAll('.product-panel').forEach(p => {
-    p.classList.add('hide');
-    setTimeout(() => p.style.display = 'none', 300);
-  });
 }
 
 // Render cart
@@ -305,24 +285,6 @@ function renderNotification(msg){
 function openOrder(){
   alert("Захиалга хийх popup");
 }
-
-// Hide panel only when clicking on another product
-document.addEventListener('click', (event) => {
-  const clickedElement = event.target;
-  const isProduct = clickedElement.closest('.product');
-  const isPanelButton = clickedElement.closest('.product-panel button');
-  if (!isProduct && !isPanelButton) {
-    return;
-  }
-  if (isProduct) {
-    document.querySelectorAll('.product-panel').forEach(p => {
-      if (p !== isProduct.querySelector('.product-panel') && !p.classList.contains('hide')) {
-        p.classList.add('hide');
-        setTimeout(() => p.style.display = 'none', 300);
-      }
-    });
-  }
-});
 </script>
 
 </body>
