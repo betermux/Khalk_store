@@ -1,156 +1,237 @@
 <!DOCTYPE html>
 <html lang="mn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Khalk Store</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Khalk Store — Modern Theme</title>
 <style>
-body {margin:0; padding:0; font-family:Arial,sans-serif; background:#111; color:#eee; text-align:center;}
-header {padding:15px; display:flex; align-items:center; justify-content:center; gap:10px; border-bottom:1px solid #222;}
-header img{width:40px;height:40px;}
-.product {margin:20px auto; padding:20px; background:#1c1c1c; border-radius:12px; max-width:400px;}
-.product img{width:100%; border-radius:12px;}
-button{padding:10px 20px; border:none; border-radius:8px; background:crimson; color:#fff; font-size:16px; cursor:pointer; margin-top:10px;}
-button:hover{background:darkred;}
-.overlay {position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; padding:10px;}
-.panel {background:#222; padding:20px; border-radius:12px; width:100%; max-width:400px; text-align:left; animation:slideUp 0.3s ease;}
-@keyframes slideUp {from {transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;}}
-input,textarea{width:100%; margin:8px 0; padding:10px; border-radius:6px; border:none; background:#333; color:#eee;}
+:root{
+  --bg:#0e0e0f; --card:#171718; --muted:#232326; --text:#eaeaea; --soft:#b9b9c1;
+  --brand:#dc143c; --brand-2:#a10f2e; --ok:#14532d; --ok-text:#a7f3d0;
+  --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
 
-/* ✅ Toast notification */
-.toast {
-  position: fixed;
-  top: -100px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #14532d;
-  color: #a7f3d0;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: bold;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-  opacity: 0;
-  z-index: 9999;
-}
-.toast.show {
-  animation: slideDown 0.5s ease forwards, fadeOut 0.5s ease 2.5s forwards;
-}
-@keyframes slideDown {
-  from {top:-100px; opacity:0;}
-  to {top:20px; opacity:1;}
-}
-@keyframes fadeOut {
-  from {opacity:1;}
-  to {opacity:0; top:-100px;}
-}
+/* Announcement + Header */
+.ann{background:#111; color:#d7d7d7; font-size:13px; text-align:center; padding:8px 12px; border-bottom:1px solid #1c1c1c}
+.header{position:sticky; top:0; z-index:50; backdrop-filter:saturate(1.2) blur(6px);
+  background:rgba(20,20,20,.7); border-bottom:1px solid #1a1a1a}
+.header-inner{max-width:1080px;margin:auto;display:flex;align-items:center;gap:10px;padding:12px 16px}
+.logo{display:flex;gap:10px;align-items:center}
+.logo img{width:36px;height:36px}
+.logo h1{font-size:18px;margin:0;letter-spacing:.4px}
+.spacer{flex:1}
+.icon-btn{border:none;background:#1a1a1b;color:var(--text);width:38px;height:38px;border-radius:12px;display:grid;place-items:center;cursor:pointer}
+.icon-btn:hover{background:#222}
+
+/* Hero */
+.hero{max-width:1080px;margin:18px auto 8px;border-radius:var(--radius);overflow:hidden;
+  background:linear-gradient(90deg,#1a1a1f, #1a1214)}
+.hero-inner{display:grid;grid-template-columns:1.1fr .9fr; gap:16px; padding:18px}
+.hero img{width:100%; border-radius:14px}
+.hero h2{margin:6px 0 8px;font-size:28px}
+.hero p{margin:0;color:#cfcfd7}
+.cta{display:flex;gap:10px;margin-top:12px}
+.btn{padding:10px 16px;border:none;border-radius:12px;background:var(--brand);color:#fff;cursor:pointer;font-weight:600}
+.btn:hover{background:var(--brand-2)}
+.btn-sec{background:#252529;color:#fff}
+.btn-sec:hover{background:#2b2b31}
+
+/* Section heading */
+.section{max-width:1080px;margin:10px auto 28px;padding:0 8px}
+.section h3{margin:16px 8px}
+
+/* Product grid */
+.grid{display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:760px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.card{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);position:relative}
+.card .media{position:relative;overflow:hidden}
+.card img{width:100%;display:block;transition:transform .4s ease}
+.card:hover img{transform:scale(1.05)}
+.badges{position:absolute;top:10px;left:10px;display:flex;gap:6px}
+.badge{font-size:12px;padding:6px 8px;border-radius:999px;background:#1f1f22;color:#e9e9f2;border:1px solid #2a2a32}
+.badge.sale{background:#2b1216;border-color:#3a1b22;color:#ffccd7}
+.content{padding:12px}
+.title{font-weight:600;margin:0 0 6px}
+.price{display:flex;align-items:center;gap:8px}
+.price-now{font-weight:800}
+.price-old{color:#8a8a95;text-decoration:line-through}
+.actions{display:flex;gap:8px;margin-top:10px}
+.small{padding:8px 12px;border-radius:10px;font-weight:600}
+
+/* Overlay panel (Order) */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.56);display:none;align-items:center;justify-content:center;padding:10px;z-index:60}
+.panel{background:#1b1b1d;border:1px solid #26262b;padding:18px;border-radius:16px;width:100%;max-width:420px;box-shadow:var(--shadow);animation:slideUp .28s ease}
+@keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+.panel h4{margin:0 0 10px}
+.form input,.form textarea{width:100%;margin:8px 0;padding:12px 12px;border-radius:10px;border:1px solid #2b2b32;background:#202024;color:var(--text)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.panel .row-end{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+
+/* Toast (slide from top) */
+.toast{position:fixed;top:-100px;left:50%;transform:translateX(-50%);background:var(--ok);color:var(--ok-text);
+  padding:12px 18px;border-radius:10px;box-shadow:var(--shadow);font-weight:700;z-index:70;opacity:0}
+.toast.show{animation:slideDown .5s ease forwards, fadeOut .5s ease 2.6s forwards}
+@keyframes slideDown{from{top:-100px;opacity:0}to{top:18px;opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0;top:-100px}}
+
+/* Helpers */
+.muted{color:var(--soft);font-size:13px}
+hr{border:none;border-top:1px solid #23232a;margin:10px 0}
 </style>
 </head>
 <body>
 
-<header>
-<img src="assets/khalk.png" alt="Logo">
-<h1>Khalk Store</h1>
+<div class="ann">📦 50,000₮-с дээш захиалга - Улаанбаатар хот дотор үнэгүй хүргэлт</div>
+
+<header class="header">
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <img src="assets/khalk.png" alt="Khalk Logo"/>
+      <h1>Khalk Store</h1>
+    </a>
+    <div class="spacer"></div>
+    <button class="icon-btn" aria-label="Search">🔎</button>
+    <button class="icon-btn" aria-label="Cart" onclick="openOrder()">🛒</button>
+  </div>
 </header>
 
-<!-- Жинхэнэ бараа -->
-<div class="product">
-<img src="assets/baraa1.png" alt="Hoodie + Baggy Jeans">
-<h2>Hoodie + Baggy Jeans</h2>
-<p>Үнэ: ₮121,000</p>
-<button onclick="openOrder()">Захиалах</button>
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <h2>Осен капсул — Hoodie & Baggy</h2>
+      <p>Өдөр тутмын минимал хэв маягийг чанартай материал, тав тухтай кроектойгоор.</p>
+      <div class="cta">
+        <a class="btn" href="#collection">Шинэ коллекц</a>
+        <button class="btn btn-sec" onclick="openOrder()">Хэмжээ асуух</button>
+      </div>
+    </div>
+    <img src="assets/baraa1.png" alt="Capsule look">
+  </div>
+</section>
+
+<!-- Products -->
+<section id="collection" class="section">
+  <h3>Танд санал болгох</h3>
+  <div id="grid" class="grid"><!-- filled by JS --></div>
+</section>
+
+<!-- Order Panel -->
+<div id="orderOverlay" class="overlay">
+  <div class="panel">
+    <h4>Захиалга хийх</h4>
+    <div class="muted">Бүтээгдэхүүн: <span id="pickedName">—</span> • Үнэ: <span id="pickedPrice">—</span></div>
+    <hr/>
+    <div class="form">
+      <div class="form-row">
+        <input id="name" placeholder="Нэр" required />
+        <input id="phone" placeholder="Утас (8 оронтой)" required />
+      </div>
+      <textarea id="address" rows="3" placeholder="Дэлгэрэнгүй хаяг" required></textarea>
+      <div class="row-end">
+        <button class="btn btn-sec" onclick="closeOrder()">Хаах</button>
+        <button class="btn" onclick="submitOrder()">Баталгаажуулах</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- Захиалга panel -->
-<div class="overlay" id="orderOverlay">
-<div class="panel">
-<h3>Захиалга хийх</h3>
-<input type="text" id="name" placeholder="Нэр" required>
-<input type="text" id="phone" placeholder="Утас" required>
-<textarea id="address" placeholder="Дэлгэрэнгүй хаяг" required></textarea>
-<p><b>Төлбөр хийх заавар:</b></p>
-<p>Данс: 123456789 (ХХ Банк)</p>
-<p>Нэр: ТаныНэр ХХК</p>
-<p>Гүйлгээний утга: <span id="orderCode"></span></p>
-<button onclick="submitOrder()">Захиалгаа баталгаажуулах</button>
-<button onclick="closeOrder()">Хаах</button>
-</div>
-</div>
-
-<!-- ✅ Toast -->
+<!-- Toast -->
 <div id="toast" class="toast"></div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+<script>
+/** ------- Demo “Shopify-like” data/UX layer ------- **/
 
-// Firebase тохиргоо
-const firebaseConfig = {
-  apiKey: "AIzaSyAEybA-Ou_PGkZINDT-opzVPUlrr6XOU8E",
-  authDomain: "khalkh-store.firebaseapp.com",
-  databaseURL: "https://khalkh-store-default-rtdb.firebaseio.com",
-  projectId: "khalkh-store",
-  storageBucket: "khalkh-store.appspot.com",
-  messagingSenderId: "205879441792",
-  appId: "1:205879441792:web:677a6abe7912d6436a2965",
-  measurementId: "G-6M9HZM8G9N"
-};
+// Demo products (та дурын зураг/үнэ нэрээ солиорой)
+const products = [
+  {id:'p1', name:'Hoodie + Baggy Jeans', price:121000, oldPrice:149000, img:'assets/baraa1.png', badges:['new','sale']},
+  {id:'p2', name:'Oversize Tee — Black', price:39000, oldPrice:null, img:'assets/baraa1.png', badges:['new']},
+  {id:'p3', name:'Cargo Pants — Graphite', price:89000, oldPrice:99000, img:'assets/baraa1.png', badges:['sale']},
+  {id:'p4', name:'Zip Hoodie — Charcoal', price:99000, oldPrice:null, img:'assets/baraa1.png', badges:[]},
+  {id:'p5', name:'Basic Beanie', price:19000, oldPrice:null, img:'assets/baraa1.png', badges:[]},
+  {id:'p6', name:'Canvas Tote — Logo', price:24000, oldPrice:29000, img:'assets/baraa1.png', badges:['sale']}
+];
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const grid = document.getElementById('grid');
+const MNT = n => `₮${n.toLocaleString('mn-MN')}`;
 
-// 9 оронтой давтагдашгүй код үүсгэх
-function generateUniqueCode(){
-  return Math.floor(100000000 + Math.random()*900000000).toString();
+// Кардуудыг рендэрлэх
+function renderGrid(){
+  grid.innerHTML = products.map(p => {
+    const sale = p.badges.includes('sale') ? '<span class="badge sale">Sale</span>' : '';
+    const nw = p.badges.includes('new') ? '<span class="badge">New</span>' : '';
+    return `
+    <article class="card">
+      <div class="media">
+        <img src="${p.img}" alt="${p.name}">
+        <div class="badges">${nw}${sale}</div>
+      </div>
+      <div class="content">
+        <h4 class="title">${p.name}</h4>
+        <div class="price">
+          <div class="price-now">${MNT(p.price)}</div>
+          ${p.oldPrice ? `<div class="price-old">${MNT(p.oldPrice)}</div>`:''}
+        </div>
+        <div class="actions">
+          <button class="btn small" onclick="openOrder('${p.id}')">Түргэн захиалах</button>
+          <button class="btn-sec small">Дэлгэрэнгүй</button>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+}
+renderGrid();
+
+// Toast
+function showToast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 3000);
 }
 
-// UI функцийг холбох
-window.openOrder = function(){
-  document.getElementById("orderOverlay").style.display = "flex";
-  document.getElementById("orderCode").innerText = generateUniqueCode();
+// Order panel state
+let currentProduct = null;
+
+window.openOrder = function(id){
+  // Хэрэв header/cart товчоос нээвэл эхний барааг санал болгоё
+  currentProduct = products.find(p => p.id===id) || products[0];
+  document.getElementById('pickedName').textContent = currentProduct.name;
+  document.getElementById('pickedPrice').textContent = MNT(currentProduct.price);
+  document.getElementById('orderOverlay').style.display='flex';
 }
 
 window.closeOrder = function(){
-  document.getElementById("orderOverlay").style.display = "none";
-  document.getElementById("name").value = "";
-  document.getElementById("phone").value = "";
-  document.getElementById("address").value = "";
+  document.getElementById('orderOverlay').style.display='none';
+  document.getElementById('name').value='';
+  document.getElementById('phone').value='';
+  document.getElementById('address').value='';
 }
 
-// ✅ Toast харуулах функц
-function showToast(message){
-  const toast = document.getElementById("toast");
-  toast.innerText = message;
-  toast.classList.add("show");
-  setTimeout(()=>{ toast.classList.remove("show"); }, 3000);
-}
-
+// Simple validation + demo “submit”
 window.submitOrder = function(){
-  const name = document.getElementById("name").value;
-  const phone = document.getElementById("phone").value;
-  const address = document.getElementById("address").value;
-  const orderCode = document.getElementById("orderCode").innerText;
-
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const address = document.getElementById('address').value.trim();
   if(!name || !phone || !address){
-    alert("Бүх талбарыг бөглөнө үү!");
+    alert('Бүх талбарыг бөглөнө үү!');
+    return;
+  }
+  if(!/^\d{8}$/.test(phone)){
+    alert('Утасны дугаар 8 оронтой байх ёстой.');
     return;
   }
 
-  const ordersRef = ref(db,"orders");
-  const newOrderRef = push(ordersRef);
-  set(newOrderRef,{
-    code: orderCode,
-    name: name,
-    phone: phone,
-    address: address,
-    paid: false,
-    createdAt: new Date().toISOString()
-  });
+  // Энд Firebase эсвэл Backend руу илгээнэ (одоогоор демо)
+  // TODO: set(...) or fetch('/api/orders', {method:'POST', body: JSON.stringify({...})})
 
-  // ✅ Toast харуулах
-  showToast(`Захиалга амжилттай! Гүйлгээний утганд кодыг бичээрэй: ${orderCode}`);
-}
+  showToast('Захиалга амжилттай илгээгдлээ!');
+  // Panel автоматаар хаахгүй — Shopify маягийн flow
+};
 </script>
-
 </body>
 </html>
