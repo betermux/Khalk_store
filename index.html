@@ -4,10 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Khalk Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet"> <!-- Сонгодог фонт -->
 <style>
 body {margin:0; padding:0; font-family:Arial,sans-serif; background:#111; color:#eee;}
 header {padding:15px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #222;}
 header img.logo{width:40px;height:40px;}
+header .logo-container {display:flex; align-items:center; gap:10px;}
+header .logo-text {font-family: 'Cinzel', serif; font-size:18px; font-weight:700; color:#fff; text-transform:uppercase;}
 header img.cart{width:28px;height:28px;cursor:pointer;}
 
 /* Products grid like Shopify */
@@ -41,14 +44,14 @@ button {
   padding:6px 12px; 
   border:none; 
   border-radius:8px; 
-  background:#007bff; /* Хөх өнгө, улааныг орлуулсан */
+  background:#007bff; 
   color:#fff; 
   font-size:13px; 
   cursor:pointer; 
   margin-top:6px;
   transition: transform 0.2s ease, background 0.2s ease;
 }
-button:hover {background:#0056b3; transform: scale(1.05);} /* Хөх өнгөний hover */
+button:hover {background:#0056b3; transform: scale(1.05);}
 
 .page{display:none;}
 .page.active{display:block;}
@@ -62,13 +65,13 @@ button:hover {background:#0056b3; transform: scale(1.05);} /* Хөх өнгөн�
   position:absolute; right:-50px; top:50%; transform:translateY(-50%); width:28px; height:28px;
   opacity:0; transition: all 0.3s ease;
 }
-.cart-item:hover{border:2px solid #007bff;} /* Улааны оронд хөх хүрээ */
+.cart-item:hover{border:2px solid #007bff;}
 .cart-item:hover .delete-btn{right:10px; opacity:1;}
 
 /* Slide in */
 @keyframes slideIn {from {opacity:0; transform:translateX(-50px);} to {opacity:1; transform:translateX(0);}}
 
-/* Notification panel - Ногоон хэвээр */
+/* Notification panel */
 #notify {
   position: fixed;
   top: 20px;
@@ -91,7 +94,7 @@ button:hover {background:#0056b3; transform: scale(1.05);} /* Хөх өнгөн�
 @keyframes notifyIn {0% {opacity:0; transform:translate(-50%, -50px);} 100% {opacity:1; transform:translate(-50%, 0);}}
 @keyframes notifyOut {0% {opacity:1; transform:translate(-50%, 0);} 100% {opacity:0; transform:translate(-50%, -50px);}}
 
-/* Add-to-cart button panel - Жижиг болгож, анимац нэмсэн */
+/* Add-to-cart button panel */
 .product-panel {
   position: absolute;
   bottom: 8px;
@@ -99,14 +102,14 @@ button:hover {background:#0056b3; transform: scale(1.05);} /* Хөх өнгөн�
   transform: translateX(-50%);
   display: none;
   gap: 6px;
-  animation: panelIn 0.3s ease forwards; /* Panel гарч ирэх анимац */
+  animation: panelIn 0.3s ease forwards;
 }
 .product-panel.hide {
-  animation: panelOut 0.3s ease forwards; /* Panel алга болох анимац */
+  animation: panelOut 0.3s ease forwards;
 }
 .product-panel button {
-  font-size: 12px; /* Жижигрүүлсэн */
-  padding: 6px 12px; /* Жижигрүүлсэн */
+  font-size: 12px;
+  padding: 6px 12px;
   border-radius: 8px;
   border: none;
   color: #fff;
@@ -116,8 +119,8 @@ button:hover {background:#0056b3; transform: scale(1.05);} /* Хөх өнгөн�
   outline: none;
 }
 .product-panel button:nth-child(1) { /* Сагсанд нэмэх */
-  background: #1c1c1c; /* Хар дэвсгэр */
-  border: 2px solid #ff4d4d; /* Улаан outline */
+  background: #1c1c1c;
+  border: 2px solid #ff4d4d;
 }
 .product-panel button:nth-child(1):hover {
   transform: scale(1.1);
@@ -125,7 +128,7 @@ button:hover {background:#0056b3; transform: scale(1.05);} /* Хөх өнгөн�
   opacity: 0.9;
 }
 .product-panel button:nth-child(2) { /* Захиалах */
-  background: linear-gradient(45deg, #ff4d4d, #ff1a1a); /* Улаан градиент */
+  background: linear-gradient(45deg, #ff4d4d, #ff1a1a);
 }
 .product-panel button:nth-child(2):hover {
   transform: scale(1.1);
@@ -150,8 +153,9 @@ button:hover {background:#0056b3; transform: scale(1.05);} /* Хөх өнгөн�
 <body>
 
 <header>
-  <div style="display:flex;align-items:center;gap:10px;">
+  <div class="logo-container">
     <img src="assets/khalk.png" class="logo" alt="Logo">
+    <span class="logo-text">Khalk Store</span>
   </div>
   <img src="assets/cart.png" class="cart" alt="Cart" onclick="openCart()">
 </header>
@@ -201,7 +205,7 @@ let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 // Show page
 function showPage(pageId){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
 }
 
@@ -218,7 +222,7 @@ function backToShop(){
 // Product panel with in/out animation
 function showPanel(el){
   document.querySelectorAll('.product-panel').forEach(p => {
-    if (p !== el.querySelector('.product-panel')) {
+    if (p !== el.querySelector('.product-panel') && !p.classList.contains('hide')) {
       p.classList.add('hide');
       setTimeout(() => p.style.display = 'none', 300); // Wait for animation to finish
     }
@@ -234,14 +238,14 @@ function showPanel(el){
 function addToCart(img, price){
   const productEl = document.querySelectorAll('.product img[src="'+img+'"]')[0].parentElement;
   productEl.style.transform = 'scale(1.05)';
-  setTimeout(()=>{ productEl.style.transform='scale(1)'; },300);
+  setTimeout(() => { productEl.style.transform='scale(1)'; }, 300);
 
-  cart.push({img,price});
+  cart.push({img, price});
   localStorage.setItem("cart", JSON.stringify(cart));
   renderNotification("Бараа сагсанд нэмэгдлээ!");
   document.querySelectorAll('.product-panel').forEach(p => {
     p.classList.add('hide');
-    setTimeout(() => p.style.display = 'none', 300); // Wait for animation to finish
+    setTimeout(() => p.style.display = 'none', 300);
   });
 }
 
@@ -258,7 +262,7 @@ function renderCart(){
   
   empty.style.display = "none";
   
-  cart.forEach((item,index)=>{
+  cart.forEach((item, index) => {
     const div = document.createElement("div");
     div.className = "cart-item";
     div.innerHTML = `<img src="${item.img}"><div>${item.price}</div>
@@ -269,7 +273,7 @@ function renderCart(){
 
 // Delete item
 function deleteItem(index){
-  cart.splice(index,1);
+  cart.splice(index, 1);
   localStorage.setItem("cart", JSON.stringify(cart));
   renderCart();
 }
@@ -280,14 +284,33 @@ function renderNotification(msg){
   notify.innerText = msg;
   notify.style.display = "block";
   notify.style.animation = "notifyIn 0.3s forwards";
-  setTimeout(()=>{ notify.style.animation = "notifyOut 0.3s forwards"; }, 1500);
-  setTimeout(()=>{ notify.style.display="none"; }, 1800);
+  setTimeout(() => { notify.style.animation = "notifyOut 0.3s forwards"; }, 1500);
+  setTimeout(() => { notify.style.display="none"; }, 1800);
 }
 
 // Order placeholder
 function openOrder(){
   alert("Захиалга хийх popup"); // Firebase order кодыг энд ашиглаж болно
 }
+
+// Hide panel only when clicking on another product
+document.addEventListener('click', (event) => {
+  const clickedElement = event.target;
+  const isProduct = clickedElement.closest('.product');
+  const isPanelButton = clickedElement.closest('.product-panel button');
+  if (!isProduct && !isPanelButton) {
+    // Do not hide panel when clicking outside products
+    return;
+  }
+  if (isProduct) {
+    document.querySelectorAll('.product-panel').forEach(p => {
+      if (p !== isProduct.querySelector('.product-panel') && !p.classList.contains('hide')) {
+        p.classList.add('hide');
+        setTimeout(() => p.style.display = 'none', 300);
+      }
+    });
+  }
+});
 </script>
 
 </body>
