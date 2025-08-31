@@ -16,6 +16,7 @@ button:hover{background:darkred;}
 .panel {background:#222; padding:20px; border-radius:12px; width:100%; max-width:400px; text-align:left; animation:slideUp 0.3s ease;}
 @keyframes slideUp {from {transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;}}
 input,textarea{width:100%; margin:8px 0; padding:10px; border-radius:6px; border:none; background:#333; color:#eee;}
+#successMsg{display:none; background:#14532d; color:#a7f3d0; padding:10px; border-radius:8px; margin-top:10px;}
 </style>
 </head>
 <body>
@@ -37,15 +38,16 @@ input,textarea{width:100%; margin:8px 0; padding:10px; border-radius:6px; border
 <div class="overlay" id="orderOverlay">
 <div class="panel">
 <h3>Захиалга хийх</h3>
-<input type="text" id="name" placeholder="Нэр">
-<input type="text" id="phone" placeholder="Утас">
-<textarea id="address" placeholder="Дэлгэрэнгүй хаяг"></textarea>
+<input type="text" id="name" placeholder="Нэр" required>
+<input type="text" id="phone" placeholder="Утас" required>
+<textarea id="address" placeholder="Дэлгэрэнгүй хаяг" required></textarea>
 <p><b>Төлбөр хийх заавар:</b></p>
 <p>Данс: 123456789 (ХХ Банк)</p>
 <p>Нэр: ТаныНэр ХХК</p>
 <p>Гүйлгээний утга: <span id="orderCode"></span></p>
 <button onclick="submitOrder()">Захиалгаа баталгаажуулах</button>
 <button onclick="closeOrder()">Хаах</button>
+<p id="successMsg"></p>
 </div>
 </div>
 
@@ -55,14 +57,14 @@ import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/
 
 // Firebase тохиргоо
 const firebaseConfig = {
-apiKey: "AIzaSyAEybA-Ou_PGkZINDT-opzVPUlrr6XOU8E",
-authDomain: "khalkh-store.firebaseapp.com",
-databaseURL: "https://khalkh-store-default-rtdb.firebaseio.com",
-projectId: "khalkh-store",
-storageBucket: "khalkh-store.appspot.com",
-messagingSenderId: "205879441792",
-appId: "1:205879441792:web:677a6abe7912d6436a2965",
-measurementId: "G-6M9HZM8G9N"
+  apiKey: "AIzaSyAEybA-Ou_PGkZINDT-opzVPUlrr6XOU8E",
+  authDomain: "khalkh-store.firebaseapp.com",
+  databaseURL: "https://khalkh-store-default-rtdb.firebaseio.com",
+  projectId: "khalkh-store",
+  storageBucket: "khalkh-store.appspot.com",
+  messagingSenderId: "205879441792",
+  appId: "1:205879441792:web:677a6abe7912d6436a2965",
+  measurementId: "G-6M9HZM8G9N"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -70,43 +72,54 @@ const db = getDatabase(app);
 
 // 9 оронтой давтагдашгүй код үүсгэх
 function generateUniqueCode(){
-return Math.floor(100000000 + Math.random()*900000000).toString();
+  return Math.floor(100000000 + Math.random()*900000000).toString();
 }
 
 // UI функцийг холбох
 window.openOrder = function(){
-document.getElementById("orderOverlay").style.display = "flex";
-document.getElementById("orderCode").innerText = generateUniqueCode();
+  document.getElementById("orderOverlay").style.display = "flex";
+  document.getElementById("orderCode").innerText = generateUniqueCode();
+  document.getElementById("successMsg").style.display = "none"; // хуучин мессеж арилгах
 }
 
 window.closeOrder = function(){
-document.getElementById("orderOverlay").style.display = "none";
+  document.getElementById("orderOverlay").style.display = "none";
+  document.getElementById("name").value = "";
+  document.getElementById("phone").value = "";
+  document.getElementById("address").value = "";
 }
 
 window.submitOrder = function(){
-const name = document.getElementById("name").value;
-const phone = document.getElementById("phone").value;
-const address = document.getElementById("address").value;
-const orderCode = document.getElementById("orderCode").innerText;
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+  const address = document.getElementById("address").value;
+  const orderCode = document.getElementById("orderCode").innerText;
 
-if(!name || !phone || !address){
-alert("Бүх талбарыг бөглөнө үү!");
-return;
-}
+  if(!name || !phone || !address){
+    alert("Бүх талбарыг бөглөнө үү!");
+    return;
+  }
 
-const ordersRef = ref(db,"orders");
-const newOrderRef = push(ordersRef);
-set(newOrderRef,{
-code: orderCode,
-name: name,
-phone: phone,
-address: address,
-paid: false,
-createdAt: new Date().toISOString()
-});
+  const ordersRef = ref(db,"orders");
+  const newOrderRef = push(ordersRef);
+  set(newOrderRef,{
+    code: orderCode,
+    name: name,
+    phone: phone,
+    address: address,
+    paid: false,
+    createdAt: new Date().toISOString()
+  });
 
-alert(`Захиалга амжилттай! Гүйлгээний утганд кодыг бичээрэй: ${orderCode}`);
-closeOrder();
+  // Амжилттай мессеж харуулах
+  const msg = document.getElementById("successMsg");
+  msg.style.display = "block";
+  msg.innerText = `Захиалга амжилттай! Гүйлгээний утганд кодыг бичээрэй: ${orderCode}`;
+
+  // 3 секундийн дараа хаах
+  setTimeout(() => {
+    closeOrder();
+  }, 3000);
 }
 </script>
 
