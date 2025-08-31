@@ -36,7 +36,7 @@ header img.cart{width:28px;height:28px;cursor:pointer;}
 .product:nth-child(1) {animation-delay: 0.1s;}
 .product:nth-child(2) {animation-delay: 0.2s;}
 .product:nth-child(3) {animation-delay: 0.3s;}
-.product:nth-child(4) {animation-delay: 0.4s;} /* Шинэ барааны хувьд */
+.product:nth-child(4) {animation-delay: 0.4s;}
 .product img {
   width:100%; 
   border-radius:12px; 
@@ -56,9 +56,18 @@ button {
   font-size:13px; 
   cursor:pointer; 
   margin-top:6px;
-  transition: transform 0.2s ease, background 0.2s ease;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  outline: none; /* Цэнхэр хүрээг хасах */
 }
-button:hover {background:#0056b3; transform: scale(1.05);}
+button:hover {
+  background:#0056b3; 
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0,123,255,0.3); /* Зөөлөн эффект */
+}
+button:focus {
+  outline: none; /* Цэнхэр хүрээг хасах */
+  box-shadow: 0 0 8px rgba(0,123,255,0.5); /* Focus дээр зөөлөн эффект */
+}
 
 .page{display:none;}
 .page.active{display:block;}
@@ -133,7 +142,7 @@ button:hover {background:#0056b3; transform: scale(1.05);}
   font-weight: 500;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-  outline: none;
+  outline: none; /* Цэнхэр хүрээг хасах */
 }
 .product-panel button:nth-child(1) { /* Сагсанд нэмэх */
   background: #1c1c1c;
@@ -144,6 +153,10 @@ button:hover {background:#0056b3; transform: scale(1.05);}
   box-shadow: 0 2px 8px rgba(255,0,0,0.3);
   opacity: 0.9;
 }
+.product-panel button:nth-child(1):focus {
+  outline: none; /* Цэнхэр хүрээг хасах */
+  box-shadow: 0 0 8px rgba(255,0,0,0.5); /* Focus дээр зөөлөн эффект */
+}
 .product-panel button:nth-child(2) { /* Захиалах */
   background: linear-gradient(45deg, #ff4d4d, #ff1a1a);
 }
@@ -152,8 +165,9 @@ button:hover {background:#0056b3; transform: scale(1.05);}
   box-shadow: 0 2px 8px rgba(255,0,0,0.3);
   opacity: 0.9;
 }
-.product-panel button:focus {
-  outline: none;
+.product-panel button:nth-child(2):focus {
+  outline: none; /* Цэнхэр хүрээг хасах */
+  box-shadow: 0 0 8px rgba(255,0,0,0.5); /* Focus дээр зөөлөн эффект */
 }
 
 /* Panel in/out animations */
