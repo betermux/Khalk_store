@@ -27,8 +27,14 @@ header img.cart{width:28px;height:28px;cursor:pointer;}
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow:hidden;
 }
-.product img{width:100%; border-radius:12px; transition: transform 0.3s ease;}
-.product:hover img{transform: translateX(10px);} /* right slide on hover */
+.product img {
+  width:100%; 
+  border-radius:12px; 
+  transition: transform 0.3s ease;
+}
+.product:hover img {
+  transform: scale(1.1); /* Зургийг 10%-иар томруулна */
+}
 .price {margin-top:8px; font-size:14px;}
 .old-price{text-decoration:line-through;color:#999;margin-left:4px;}
 button{padding:6px 12px; border:none; border-radius:8px; background:crimson; color:#fff; font-size:13px; cursor:pointer; margin-top:6px;}
