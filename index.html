@@ -11,7 +11,7 @@ header img.logo{width:40px;height:40px;}
 header img.cart{width:28px;height:28px;cursor:pointer;}
 
 .products{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;padding:20px;}
-.product {background:#1c1c1c; border-radius:12px; padding:15px; text-align:center; position:relative; cursor:pointer;}
+.product {background:#1c1c1c; border-radius:12px; padding:15px; text-align:center; position:relative; cursor:pointer; transition: transform 0.2s ease;}
 .product img{width:100%; border-radius:12px;}
 .price {margin-top:10px; font-size:16px;}
 .old-price{text-decoration:line-through;color:#999;margin-left:6px;}
@@ -27,12 +27,12 @@ button:hover{background:darkred;}
 .cart-item img{width:60px;border-radius:8px;}
 .cart-empty{text-align:center;margin-top:50px;color:#888;font-size:18px;}
 .cart-item .delete-btn{
-  position:absolute; left:-50px; top:50%; transform:translateY(-50%); width:32px; height:32px;
+  position:absolute; right:-50px; top:50%; transform:translateY(-50%); width:32px; height:32px;
   opacity:0; transition: all 0.3s ease;
 }
 .cart-item:hover{border:2px solid red;}
 .cart-item:hover .delete-btn{
-  left:10px; opacity:1;
+  right:10px; opacity:1;
 }
 
 /* Slide in */
@@ -64,6 +64,19 @@ button:hover{background:darkred;}
   0% {opacity:1; transform:translate(-50%, 0);}
   100% {opacity:0; transform:translate(-50%, -50px);}
 }
+
+/* Add-to-cart button panel */
+.product-panel {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display:none;
+  gap:10px;
+}
+.product-panel button {
+  font-size:14px; padding:6px 12px;
+}
 </style>
 </head>
 <body>
@@ -78,24 +91,35 @@ button:hover{background:darkred;}
 <!-- Products Page -->
 <div id="productsPage" class="page active">
   <div class="products">
-    <div class="product" onclick="addToCartEffect(this,'assets/baraa1.png','₮121,000')">
+    <div class="product" onclick="showPanel(this)">
       <img src="assets/baraa1.png" alt="Baraa1">
       <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa1.png','₮121,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
+      </div>
     </div>
-    <div class="product" onclick="addToCartEffect(this,'assets/baraa2.png','₮177,000')">
+    <div class="product" onclick="showPanel(this)">
       <img src="assets/baraa2.png" alt="Baraa2">
       <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa2.png','₮177,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
+      </div>
     </div>
-    <div class="product" onclick="addToCartEffect(this,'assets/baraa3.png','₮153,000')">
+    <div class="product" onclick="showPanel(this)">
       <img src="assets/baraa3.png" alt="Baraa3">
       <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- Cart Page -->
 <div id="cartPage" class="page cart-page">
-  <h2>🛒</h2>
   <div id="cartItems"></div>
   <div class="cart-empty" id="cartEmpty">Сагс хоосон байна</div>
   <button onclick="backToShop()">⇦ Дэлгүүр рүү буцах</button>
@@ -107,11 +131,13 @@ button:hover{background:darkred;}
 <script>
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
+// Show page
 function showPage(pageId){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
 }
 
+// Cart page
 function openCart(){
   showPage('cartPage');
   renderCart();
@@ -121,36 +147,26 @@ function backToShop(){
   showPage('productsPage');
 }
 
-function addToCartEffect(el,img,price){
-  const clone = el.cloneNode(true);
-  const rect = el.getBoundingClientRect();
-  clone.style.position = 'fixed';
-  clone.style.left = rect.left+'px';
-  clone.style.top = rect.top+'px';
-  clone.style.width = rect.width+'px';
-  clone.style.zIndex = 1000;
-  clone.style.transition = 'all 0.7s ease';
-  document.body.appendChild(clone);
-
-  setTimeout(()=>{
-    clone.style.left = (window.innerWidth - 70) + 'px';
-    clone.style.top = '20px';
-    clone.style.width = '50px';
-    clone.style.opacity = '0.5';
-  },50);
-
-  setTimeout(()=>{
-    document.body.removeChild(clone);
-    addToCart(img,price);
-  },750);
+// Product panel
+function showPanel(el){
+  document.querySelectorAll('.product-panel').forEach(p=>p.style.display='none');
+  const panel = el.querySelector('.product-panel');
+  if(panel) panel.style.display='flex';
 }
 
+// Add to cart
 function addToCart(img, price){
+  const productEl = document.querySelectorAll('.product img[src="'+img+'"]')[0].parentElement;
+  productEl.style.transform = 'scale(1.1)';
+  setTimeout(()=>{ productEl.style.transform='scale(1)'; },300);
+
   cart.push({img,price});
   localStorage.setItem("cart", JSON.stringify(cart));
   renderNotification("Бараа сагсанд нэмэгдлээ!");
+  document.querySelectorAll('.product-panel').forEach(p=>p.style.display='none');
 }
 
+// Render cart
 function renderCart(){
   const container = document.getElementById("cartItems");
   const empty = document.getElementById("cartEmpty");
@@ -172,21 +188,28 @@ function renderCart(){
   });
 }
 
+// Delete item
 function deleteItem(index){
   cart.splice(index,1);
   localStorage.setItem("cart", JSON.stringify(cart));
   renderCart();
 }
 
-// Notification with in/out animation
+// Notification animation
 function renderNotification(msg){
   const notify = document.getElementById("notify");
   notify.innerText = msg;
   notify.style.display = "block";
-  notify.style.animation = "notifyIn 0.5s forwards";
-  setTimeout(()=>{ notify.style.animation = "notifyOut 0.5s forwards"; }, 2000);
-  setTimeout(()=>{ notify.style.display="none"; }, 2500);
+  notify.style.animation = "notifyIn 0.3s forwards";
+  setTimeout(()=>{ notify.style.animation = "notifyOut 0.3s forwards"; }, 1500);
+  setTimeout(()=>{ notify.style.display="none"; }, 1800);
 }
+
+// Order placeholder
+function openOrder(){
+  alert("Захиалга хийх popup"); // Таны Firebase order кодыг энд ашиглаж болно
+}
+
 </script>
 
 </body>
