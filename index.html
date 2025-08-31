@@ -23,35 +23,22 @@ button:hover{background:darkred;}
 
 /* Cart */
 .cart-page{padding:20px;}
-.cart-item{background:#1c1c1c; border-radius:12px; padding:15px; margin-bottom:10px; display:flex; align-items:center; gap:10px;}
+.cart-item{background:#1c1c1c; border-radius:12px; padding:15px; margin-bottom:10px; display:flex; align-items:center; gap:10px; position:relative; animation:slideIn 0.5s ease forwards;}
 .cart-item img{width:60px;border-radius:8px;}
 .cart-empty{text-align:center;margin-top:50px;color:#888;font-size:18px;}
 
-/* Notification panel */
-#notify {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #28a745;
-  border: 2px solid #00ff00;
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: bold;
-  display: none;
-  z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  animation: slideFadeInOut 3s forwards;
+/* Delete button */
+.cart-item .delete-btn{
+  position:absolute; left:-50px; top:50%; transform:translateY(-50%); width:32px; height:32px;
+  opacity:0; transition: all 0.3s ease;
+}
+.cart-item:hover{border:2px solid red;}
+.cart-item:hover .delete-btn{
+  left:10px; opacity:1;
 }
 
-@keyframes slideFadeInOut {
-  0% {opacity:0; transform:translate(-50%, -50px);}
-  10% {opacity:1; transform:translate(-50%, 0);}
-  90% {opacity:1; transform:translate(-50%, 0);}
-  100% {opacity:0; transform:translate(-50%, -50px);}
-}
+/* Slide in */
+@keyframes slideIn {from {opacity:0; transform:translateX(-50px);} to {opacity:1; transform:translateX(0);}}
 </style>
 </head>
 <body>
@@ -94,10 +81,10 @@ button:hover{background:darkred;}
 </div>
 
 <!-- Notification -->
-<div id="notify">Бараа сагсанд нэмэгдлээ!</div>
+<div id="notify" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#28a745;border:2px solid #00ff00;color:#fff;padding:12px 20px;border-radius:8px;font-size:15px;font-weight:bold;display:none;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,0.3);animation:slideFadeInOut 3s forwards;">Бараа сагсанд нэмэгдлээ!</div>
 
 <script>
-let cart = [];
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 function showPage(pageId){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -115,6 +102,7 @@ function backToShop(){
 
 function addToCart(img, price){
   cart.push({img,price});
+  localStorage.setItem("cart", JSON.stringify(cart));
   renderNotification("Бараа сагсанд нэмэгдлээ!");
 }
 
@@ -130,12 +118,19 @@ function renderCart(){
   
   empty.style.display = "none";
   
-  cart.forEach(item=>{
+  cart.forEach((item,index)=>{
     const div = document.createElement("div");
     div.className = "cart-item";
-    div.innerHTML = `<img src="${item.img}"><div>${item.price}</div>`;
+    div.innerHTML = `<img src="${item.img}"><div>${item.price}</div>
+    <img src="assets/delete.png" class="delete-btn" onclick="deleteItem(${index})">`;
     container.appendChild(div);
   });
+}
+
+function deleteItem(index){
+  cart.splice(index,1);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCart();
 }
 
 function renderNotification(msg){
@@ -146,6 +141,7 @@ function renderNotification(msg){
   void notify.offsetWidth; // restart animation
   notify.style.animation = "slideFadeInOut 3s forwards";
 }
+
 </script>
 
 </body>
