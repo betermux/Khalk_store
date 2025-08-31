@@ -1,134 +1,114 @@
 <!DOCTYPE html>
 <html lang="mn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Khalk Store</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: "Poppins", Arial, sans-serif;
-      background: #0d0d0d;
-      color: #fff;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px 25px;
-      background: #000;
-      border-bottom: 1px solid #333;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-    header img {
-      height: 40px;
-    }
-    nav a {
-      color: #fff;
-      margin-left: 20px;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s;
-    }
-    nav a:hover {
-      color: #f33;
-    }
-
-    .hero {
-      text-align: center;
-      padding: 60px 20px;
-      background: linear-gradient(to right, #111, #1a1a1a);
-    }
-    .hero h1 {
-      font-size: 2.2rem;
-      margin-bottom: 10px;
-      color: #f33;
-    }
-    .hero p {
-      font-size: 1rem;
-      color: #aaa;
-    }
-
-    .products {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      padding: 40px 20px;
-      max-width: 1100px;
-      margin: auto;
-    }
-    .product {
-      background: #111;
-      border: 1px solid #333;
-      border-radius: 12px;
-      overflow: hidden;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .product:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 0 25px rgba(255,0,0,0.3);
-    }
-    .product img {
-      width: 100%;
-      height: 250px;
-      object-fit: cover;
-    }
-    .product-info {
-      padding: 15px;
-      text-align: center;
-    }
-    .product-info p {
-      margin: 0;
-      color: #f33;
-      font-weight: bold;
-      font-size: 1rem;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khalk Store</title>
+<style>
+body {margin:0; padding:0; font-family:Arial,sans-serif; background:#111; color:#eee; text-align:center;}
+header {padding:15px; display:flex; align-items:center; justify-content:center; gap:10px; border-bottom:1px solid #222;}
+header img{width:40px;height:40px;}
+.product {margin:20px auto; padding:20px; background:#1c1c1c; border-radius:12px; max-width:400px;}
+.product img{width:100%; border-radius:12px;}
+button{padding:10px 20px; border:none; border-radius:8px; background:crimson; color:#fff; font-size:16px; cursor:pointer; margin-top:10px;}
+button:hover{background:darkred;}
+.overlay {position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; padding:10px;}
+.panel {background:#222; padding:20px; border-radius:12px; width:100%; max-width:400px; text-align:left; animation:slideUp 0.3s ease;}
+@keyframes slideUp {from {transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+input,textarea{width:100%; margin:8px 0; padding:10px; border-radius:6px; border:none; background:#333; color:#eee;}
+</style>
 </head>
 <body>
 
 <header>
-  <img src="assets/khalk.png" alt="Khalk Store Logo">
-  <nav>
-    <a href="#">Нүүр</a>
-    <a href="#">Бүтээгдэхүүн</a>
-    <a href="#">Холбоо барих</a>
-  </nav>
+<img src="assets/khalk.png" alt="Logo">
+<h1>Khalk Store</h1>
 </header>
 
-<section class="hero">
-  <h1>Khalk Store</h1>
-  <p>Орчин үеийн стильтэй хувцаснууд</p>
-</section>
+<!-- Жинхэнэ бараа -->
+<div class="product">
+<img src="assets/baraa1.png" alt="Hoodie + Baggy Jeans">
+<h2>Hoodie + Baggy Jeans</h2>
+<p>Үнэ: ₮121,000</p>
+<button onclick="openOrder()">Захиалах</button>
+</div>
 
-<section class="products">
-  <!-- Бүтээгдэхүүн 1 -->
-  <div class="product">
-    <img src="assets/baraa1.png" alt="Hoodie + Baggy Jeans">
-    <div class="product-info">
-      <p>₮121,000</p>
-    </div>
-  </div>
+<!-- Захиалга panel -->
+<div class="overlay" id="orderOverlay">
+<div class="panel">
+<h3>Захиалга хийх</h3>
+<input type="text" id="name" placeholder="Нэр">
+<input type="text" id="phone" placeholder="Утас">
+<textarea id="address" placeholder="Дэлгэрэнгүй хаяг"></textarea>
+<p><b>Төлбөр хийх заавар:</b></p>
+<p>Данс: 123456789 (ХХ Банк)</p>
+<p>Нэр: ТаныНэр ХХК</p>
+<p>Гүйлгээний утга: <span id="orderCode"></span></p>
+<button onclick="submitOrder()">Захиалгаа баталгаажуулах</button>
+<button onclick="closeOrder()">Хаах</button>
+</div>
+</div>
 
-  <!-- Бүтээгдэхүүн 2 -->
-  <div class="product">
-    <img src="assets/baraa2.png" alt="Oversize T-shirt">
-    <div class="product-info">
-      <p>₮45,000</p>
-    </div>
-  </div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  <!-- Бүтээгдэхүүн 3 -->
-  <div class="product">
-    <img src="assets/baraa3.png" alt="Cargo Pants">
-    <div class="product-info">
-      <p>₮68,000</p>
-    </div>
-  </div>
-</section>
+// Firebase тохиргоо
+const firebaseConfig = {
+apiKey: "AIzaSyAEybA-Ou_PGkZINDT-opzVPUlrr6XOU8E",
+authDomain: "khalkh-store.firebaseapp.com",
+databaseURL: "https://khalkh-store-default-rtdb.firebaseio.com",
+projectId: "khalkh-store",
+storageBucket: "khalkh-store.appspot.com",
+messagingSenderId: "205879441792",
+appId: "1:205879441792:web:677a6abe7912d6436a2965",
+measurementId: "G-6M9HZM8G9N"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// 9 оронтой давтагдашгүй код үүсгэх
+function generateUniqueCode(){
+return Math.floor(100000000 + Math.random()*900000000).toString();
+}
+
+// UI функцийг холбох
+window.openOrder = function(){
+document.getElementById("orderOverlay").style.display = "flex";
+document.getElementById("orderCode").innerText = generateUniqueCode();
+}
+
+window.closeOrder = function(){
+document.getElementById("orderOverlay").style.display = "none";
+}
+
+window.submitOrder = function(){
+const name = document.getElementById("name").value;
+const phone = document.getElementById("phone").value;
+const address = document.getElementById("address").value;
+const orderCode = document.getElementById("orderCode").innerText;
+
+if(!name || !phone || !address){
+alert("Бүх талбарыг бөглөнө үү!");
+return;
+}
+
+const ordersRef = ref(db,"orders");
+const newOrderRef = push(ordersRef);
+set(newOrderRef,{
+code: orderCode,
+name: name,
+phone: phone,
+address: address,
+paid: false,
+createdAt: new Date().toISOString()
+});
+
+alert(`Захиалга амжилттай! Гүйлгээний утганд кодыг бичээрэй: ${orderCode}`);
+closeOrder();
+}
+</script>
 
 </body>
 </html>
