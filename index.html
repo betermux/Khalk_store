@@ -27,6 +27,31 @@ button:hover{background:darkred;}
 .cart-item img{width:60px;border-radius:8px;}
 .cart-empty{text-align:center;margin-top:50px;color:#888;font-size:18px;}
 
+/* Notification panel */
+#notify {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #28a745;
+  border: 2px solid #00ff00;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  display: none;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  animation: slideFadeInOut 3s forwards;
+}
+
+@keyframes slideFadeInOut {
+  0% {opacity:0; transform:translate(-50%, -50px);}
+  10% {opacity:1; transform:translate(-50%, 0);}
+  90% {opacity:1; transform:translate(-50%, 0);}
+  100% {opacity:0; transform:translate(-50%, -50px);}
+}
 </style>
 </head>
 <body>
@@ -68,6 +93,9 @@ button:hover{background:darkred;}
   <button onclick="backToShop()">⇦ Дэлгүүр рүү буцах</button>
 </div>
 
+<!-- Notification -->
+<div id="notify">Бараа сагсанд нэмэгдлээ!</div>
+
 <script>
 let cart = [];
 
@@ -87,7 +115,7 @@ function backToShop(){
 
 function addToCart(img, price){
   cart.push({img,price});
-  alert("Бараа сагсанд нэмэгдлээ!");
+  renderNotification("Бараа сагсанд нэмэгдлээ!");
 }
 
 function renderCart(){
@@ -108,6 +136,15 @@ function renderCart(){
     div.innerHTML = `<img src="${item.img}"><div>${item.price}</div>`;
     container.appendChild(div);
   });
+}
+
+function renderNotification(msg){
+  const notify = document.getElementById("notify");
+  notify.innerText = msg;
+  notify.style.display = "block";
+  notify.style.animation = "none";
+  void notify.offsetWidth; // restart animation
+  notify.style.animation = "slideFadeInOut 3s forwards";
 }
 </script>
 
