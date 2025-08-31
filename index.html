@@ -16,7 +16,34 @@ button:hover{background:darkred;}
 .panel {background:#222; padding:20px; border-radius:12px; width:100%; max-width:400px; text-align:left; animation:slideUp 0.3s ease;}
 @keyframes slideUp {from {transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;}}
 input,textarea{width:100%; margin:8px 0; padding:10px; border-radius:6px; border:none; background:#333; color:#eee;}
-#successMsg{display:none; background:#14532d; color:#a7f3d0; padding:10px; border-radius:8px; margin-top:10px;}
+
+/* ✅ Toast notification */
+.toast {
+  position: fixed;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #14532d;
+  color: #a7f3d0;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  opacity: 0;
+  z-index: 9999;
+}
+.toast.show {
+  animation: slideDown 0.5s ease forwards, fadeOut 0.5s ease 2.5s forwards;
+}
+@keyframes slideDown {
+  from {top:-100px; opacity:0;}
+  to {top:20px; opacity:1;}
+}
+@keyframes fadeOut {
+  from {opacity:1;}
+  to {opacity:0; top:-100px;}
+}
 </style>
 </head>
 <body>
@@ -47,9 +74,11 @@ input,textarea{width:100%; margin:8px 0; padding:10px; border-radius:6px; border
 <p>Гүйлгээний утга: <span id="orderCode"></span></p>
 <button onclick="submitOrder()">Захиалгаа баталгаажуулах</button>
 <button onclick="closeOrder()">Хаах</button>
-<p id="successMsg"></p>
 </div>
 </div>
+
+<!-- ✅ Toast -->
+<div id="toast" class="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -79,7 +108,6 @@ function generateUniqueCode(){
 window.openOrder = function(){
   document.getElementById("orderOverlay").style.display = "flex";
   document.getElementById("orderCode").innerText = generateUniqueCode();
-  document.getElementById("successMsg").style.display = "none"; // хуучин мессеж арилгах
 }
 
 window.closeOrder = function(){
@@ -87,6 +115,14 @@ window.closeOrder = function(){
   document.getElementById("name").value = "";
   document.getElementById("phone").value = "";
   document.getElementById("address").value = "";
+}
+
+// ✅ Toast харуулах функц
+function showToast(message){
+  const toast = document.getElementById("toast");
+  toast.innerText = message;
+  toast.classList.add("show");
+  setTimeout(()=>{ toast.classList.remove("show"); }, 3000);
 }
 
 window.submitOrder = function(){
@@ -111,15 +147,8 @@ window.submitOrder = function(){
     createdAt: new Date().toISOString()
   });
 
-  // Амжилттай мессеж харуулах
-  const msg = document.getElementById("successMsg");
-  msg.style.display = "block";
-  msg.innerText = `Захиалга амжилттай! Гүйлгээний утганд кодыг бичээрэй: ${orderCode}`;
-
-  // 3 секундийн дараа хаах
-  setTimeout(() => {
-    closeOrder();
-  }, 3000);
+  // ✅ Toast харуулах
+  showToast(`Захиалга амжилттай! Гүйлгээний утганд кодыг бичээрэй: ${orderCode}`);
 }
 </script>
 
