@@ -144,11 +144,11 @@ button:focus {
 /* Add-to-cart button panel */
 .product-panel {
   position: absolute;
-  bottom: 8px;
+  bottom: 10px; /* Зургийн доод хэсэгт ойртоно */
   left: 50%;
   transform: translateX(-50%);
   display: none;
-  gap: 6px;
+  gap: 8px; /* Товч хоорондын зайг нэмэгдүүлсэн */
   opacity: 0;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
@@ -170,7 +170,8 @@ button:focus {
   outline: none;
 }
 .product-panel button:nth-child(1) {
-  background: linear-gradient(45deg, #ff4d4d, #ff1a1a);
+  background: #1c1c1c;
+  border: 2px solid #ff4d4d;
 }
 .product-panel button:nth-child(1):hover {
   transform: scale(1.1);
@@ -178,6 +179,18 @@ button:focus {
   opacity: 0.9;
 }
 .product-panel button:nth-child(1):focus {
+  outline: none;
+  box-shadow: 0 0 8px rgba(255,0,0,0.5);
+}
+.product-panel button:nth-child(2) {
+  background: linear-gradient(45deg, #ff4d4d, #ff1a1a);
+}
+.product-panel button:nth-child(2):hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(255,0,0,0.3);
+  opacity: 0.9;
+}
+.product-panel button:nth-child(2):focus {
   outline: none;
   box-shadow: 0 0 8px rgba(255,0,0,0.5);
 }
@@ -305,6 +318,7 @@ button:focus {
       <img src="assets/baraa1.png" alt="Baraa1">
       <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa1.png','₮121,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa1.png','121000')">Захиалах</button>
       </div>
     </div>
@@ -312,6 +326,7 @@ button:focus {
       <img src="assets/baraa2.png" alt="Baraa2">
       <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa2.png','₮177,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa2.png','177000')">Захиалах</button>
       </div>
     </div>
@@ -319,6 +334,7 @@ button:focus {
       <img src="assets/baraa3.png" alt="Baraa3">
       <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa3.png','153000')">Захиалах</button>
       </div>
     </div>
@@ -326,6 +342,7 @@ button:focus {
       <img src="assets/baraa4.png" alt="Baraa4">
       <div class="price">₮154,000 <span class="old-price">₮214,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa4.png','₮154,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa4.png','154000')">Захиалах</button>
       </div>
     </div>
@@ -333,6 +350,7 @@ button:focus {
       <img src="assets/baraa5.png" alt="Baraa5">
       <div class="price">₮151,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa5.png','₮151,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa5.png','151000')">Захиалах</button>
       </div>
     </div>
@@ -346,6 +364,7 @@ button:focus {
       <img src="assets/baraa1.png" alt="Baraa1">
       <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa1.png','₮121,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa1.png','121000')">Захиалах</button>
       </div>
     </div>
@@ -353,6 +372,7 @@ button:focus {
       <img src="assets/baraa2.png" alt="Baraa2">
       <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa2.png','₮177,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa2.png','177000')">Захиалах</button>
       </div>
     </div>
@@ -360,6 +380,7 @@ button:focus {
       <img src="assets/baraa3.png" alt="Baraa3">
       <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa3.png','153000')">Захиалах</button>
       </div>
     </div>
@@ -367,6 +388,7 @@ button:focus {
       <img src="assets/baraa4.png" alt="Baraa4">
       <div class="price">₮154,000 <span class="old-price">₮214,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa4.png','₮154,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa4.png','154000')">Захиалах</button>
       </div>
     </div>
@@ -374,6 +396,7 @@ button:focus {
       <img src="assets/baraa5.png" alt="Baraa5">
       <div class="price">₮151,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa5.png','₮151,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa5.png','151000')">Захиалах</button>
       </div>
     </div>
@@ -387,6 +410,7 @@ button:focus {
       <img src="assets/baraa1.png" alt="Baraa1">
       <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa1.png','₮121,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa1.png','121000')">Захиалах</button>
       </div>
     </div>
@@ -394,6 +418,7 @@ button:focus {
       <img src="assets/baraa2.png" alt="Baraa2">
       <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa2.png','₮177,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa2.png','177000')">Захиалах</button>
       </div>
     </div>
@@ -401,6 +426,7 @@ button:focus {
       <img src="assets/baraa3.png" alt="Baraa3">
       <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa3.png','153000')">Захиалах</button>
       </div>
     </div>
@@ -408,6 +434,7 @@ button:focus {
       <img src="assets/baraa4.png" alt="Baraa4">
       <div class="price">₮154,000 <span class="old-price">₮214,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa4.png','₮154,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa4.png','154000')">Захиалах</button>
       </div>
     </div>
@@ -415,6 +442,7 @@ button:focus {
       <img src="assets/baraa5.png" alt="Baraa5">
       <div class="price">₮151,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa5.png','₮151,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa5.png','151000')">Захиалах</button>
       </div>
     </div>
@@ -428,6 +456,7 @@ button:focus {
       <img src="assets/baraa1.png" alt="Baraa1">
       <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa1.png','₮121,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa1.png','121000')">Захиалах</button>
       </div>
     </div>
@@ -435,6 +464,7 @@ button:focus {
       <img src="assets/baraa2.png" alt="Baraa2">
       <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa2.png','₮177,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa2.png','177000')">Захиалах</button>
       </div>
     </div>
@@ -442,6 +472,7 @@ button:focus {
       <img src="assets/baraa3.png" alt="Baraa3">
       <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa3.png','153000')">Захиалах</button>
       </div>
     </div>
@@ -449,6 +480,7 @@ button:focus {
       <img src="assets/baraa4.png" alt="Baraa4">
       <div class="price">₮154,000 <span class="old-price">₮214,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa4.png','₮154,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa4.png','154000')">Захиалах</button>
       </div>
     </div>
@@ -456,6 +488,7 @@ button:focus {
       <img src="assets/baraa5.png" alt="Baraa5">
       <div class="price">₮151,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa5.png','₮151,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa5.png','151000')">Захиалах</button>
       </div>
     </div>
@@ -469,6 +502,7 @@ button:focus {
       <img src="assets/baraa1.png" alt="Baraa1">
       <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa1.png','₮121,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa1.png','121000')">Захиалах</button>
       </div>
     </div>
@@ -476,6 +510,7 @@ button:focus {
       <img src="assets/baraa2.png" alt="Baraa2">
       <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa2.png','₮177,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa2.png','177000')">Захиалах</button>
       </div>
     </div>
@@ -483,6 +518,7 @@ button:focus {
       <img src="assets/baraa3.png" alt="Baraa3">
       <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa3.png','153000')">Захиалах</button>
       </div>
     </div>
@@ -490,6 +526,7 @@ button:focus {
       <img src="assets/baraa4.png" alt="Baraa4">
       <div class="price">₮154,000 <span class="old-price">₮214,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa4.png','₮154,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa4.png','154000')">Захиалах</button>
       </div>
     </div>
@@ -497,6 +534,7 @@ button:focus {
       <img src="assets/baraa5.png" alt="Baraa5">
       <div class="price">₮151,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa5.png','₮151,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa5.png','151000')">Захиалах</button>
       </div>
     </div>
@@ -510,6 +548,7 @@ button:focus {
       <img src="assets/baraa1.png" alt="Baraa1">
       <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa1.png','₮121,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa1.png','121000')">Захиалах</button>
       </div>
     </div>
@@ -517,6 +556,7 @@ button:focus {
       <img src="assets/baraa2.png" alt="Baraa2">
       <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa2.png','₮177,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa2.png','177000')">Захиалах</button>
       </div>
     </div>
@@ -524,6 +564,7 @@ button:focus {
       <img src="assets/baraa3.png" alt="Baraa3">
       <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa3.png','153000')">Захиалах</button>
       </div>
     </div>
@@ -531,6 +572,7 @@ button:focus {
       <img src="assets/baraa4.png" alt="Baraa4">
       <div class="price">₮154,000 <span class="old-price">₮214,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa4.png','₮154,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa4.png','154000')">Захиалах</button>
       </div>
     </div>
@@ -538,6 +580,7 @@ button:focus {
       <img src="assets/baraa5.png" alt="Baraa5">
       <div class="price">₮151,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa5.png','₮151,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder('assets/baraa5.png','151000')">Захиалах</button>
       </div>
     </div>
@@ -557,7 +600,7 @@ button:focus {
 <!-- Code Modal -->
 <div id="codeModal">
   <div class="code-modal-content">
-    <h3>Төлбөрийн код</h3>
+    <h3>Захиалга</h3>
     <p>Доорх кодыг ашиглан төлбөрөө хийнэ үү</p>
     <p id="paymentCode"></p>
     <button onclick="closeCodeModal()">Хаах</button>
@@ -580,7 +623,7 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
-const db = firebase.firestore();
+const db = firebase.firestore(); // db-г энд тодорхойлсон
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
@@ -597,6 +640,7 @@ function showPage(pageId){
 // Cart page
 function openCart(){
   showPage('cartPage');
+  renderCart();
 }
 
 function backToShop(){
@@ -613,6 +657,17 @@ function toggleSidebar(){
     sidebar.classList.add('active');
     sidebar.style.animation = 'sidebarIn 0.3s forwards';
   }
+}
+
+// Add to cart with scale effect
+function addToCart(img, price){
+  const productEl = document.querySelectorAll('.product img[src="'+img+'"]')[0].parentElement;
+  productEl.style.transform = 'scale(1.05)';
+  setTimeout(() => { productEl.style.transform='scale(1)'; }, 300);
+
+  cart.push({img, price});
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderNotification("Бараа сагсанд нэмэгдлээ!");
 }
 
 // Render cart
@@ -687,7 +742,7 @@ async function openOrder(img, amount) {
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     codeDisplay.innerText = uniqueCode;
-    renderNotification("Төлбөрийн код амжилттай үүслээ!");
+    renderNotification("Захиалга амжилттай үүслээ!");
   } catch (error) {
     codeDisplay.innerText = "Алдаа гарлаа: " + error.message;
     console.error(error);
