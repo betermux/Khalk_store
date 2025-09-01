@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Khalk Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 <style>
 body {margin:0; padding:0; font-family:Arial,sans-serif; background:#111; color:#eee;}
 header {
@@ -197,8 +200,8 @@ button:focus {
   to {opacity: 1; transform: translateX(-50%) scale(1);}
 }
 
-/* QR code modal */
-#qpayModal {
+/* Code modal */
+#codeModal {
   display: none;
   position: fixed;
   top: 0;
@@ -210,7 +213,7 @@ button:focus {
   justify-content: center;
   align-items: center;
 }
-.qpay-modal-content {
+.code-modal-content {
   background: #1c1c1c;
   border-radius: 12px;
   padding: 20px;
@@ -218,12 +221,15 @@ button:focus {
   width: 300px;
   color: #fff;
 }
-.qpay-modal-content img {
-  width: 200px;
-  height: 200px;
-  margin: 10px auto;
+.code-modal-content h3 {
+  margin: 0 0 10px;
 }
-.qpay-modal-content button {
+.code-modal-content p {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff4d4d;
+}
+.code-modal-content button {
   background: #ff4d4d;
   padding: 10px 20px;
   border-radius: 8px;
@@ -543,28 +549,32 @@ button:focus {
 <!-- Notification -->
 <div id="notify"></div>
 
-<!-- QPay Modal -->
-<div id="qpayModal">
-  <div class="qpay-modal-content">
-    <h3>Төлбөр хийх</h3>
-    <p>Доорх QR кодыг уншуулж төлбөрөө хийнэ үү</p>
-    <img id="qpayQR" src="" alt="QPay QR Code">
-    <p id="qpayStatus">Төлбөрийг хүлээж байна...</p>
-    <button onclick="closeQPayModal()">Хаах</button>
+<!-- Code Modal -->
+<div id="codeModal">
+  <div class="code-modal-content">
+    <h3>Төлбөрийн код</h3>
+    <p>Доорх кодыг ашиглан төлбөрөө хийнэ үү</p>
+    <p id="paymentCode"></p>
+    <button onclick="closeCodeModal()">Хаах</button>
   </div>
 </div>
 
 <script>
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-// QPay API configurations (Таны мэдээллийг оруулна уу)
-const QPAY_CONFIG = {
-  invoice_code: "YOUR_INVOICE_CODE",
-  client_id: "YOUR_CLIENT_ID",
-  client_secret: "YOUR_CLIENT_SECRET",
-  callback_url: "https://yourwebsite.com/payments",
-  api_url: "https://merchant-sandbox.qpay.mn/v2"
+// Firebase configuration (Таны Firebase тохиргоог оруулна уу)
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 // Show page
 function showPage(pageId){
@@ -647,75 +657,48 @@ function renderNotification(msg){
   setTimeout(() => { notify.style.display="none"; }, 1800);
 }
 
-// QPay order processing
-async function openOrder(img, amount){
-  const modal = document.getElementById("qpayModal");
-  const qrImage = document.getElementById("qpayQR");
-  const statusText = document.getElementById("qpayStatus");
+// Generate unique 6-character code
+async function generateUniqueCode() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+
+  // Check if code exists in Firestore
+  const codeRef = db.collection('paymentCodes').doc(code);
+  const doc = await codeRef.get();
+  if (doc.exists) {
+    // If code exists, try generating a new one
+    return generateUniqueCode();
+  }
+  return code;
+}
+
+// Save code to Firestore and show in modal
+async function openOrder(img, amount) {
+  const modal = document.getElementById("codeModal");
+  const codeDisplay = document.getElementById("paymentCode");
+  codeDisplay.innerText = "Кодыг үүсгэж байна...";
   modal.style.display = "flex";
-  qrImage.src = "";
-  statusText.innerText = "Төлбөрийг хүлээж байна...";
 
   try {
-    const tokenResponse = await fetch(`${QPAY_CONFIG.api_url}/auth/token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Basic " + btoa(`${QPAY_CONFIG.client_id}:${QPAY_CONFIG.client_secret}`)
-      }
+    const uniqueCode = await generateUniqueCode();
+    await db.collection('paymentCodes').doc(uniqueCode).set({
+      image: img,
+      amount: parseFloat(amount),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    const tokenData = await tokenResponse.json();
-    const accessToken = tokenData.access_token;
-
-    const invoiceResponse = await fetch(`${QPAY_CONFIG.api_url}/invoice`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${accessToken}`
-      },
-      body: JSON.stringify({
-        invoice_code: QPAY_CONFIG.invoice_code,
-        sender_invoice_no: `INV-${Date.now()}`,
-        invoice_receiver_code: "terminal",
-        invoice_description: `Төлбөр: ${img}`,
-        amount: parseFloat(amount),
-        callback_url: QPAY_CONFIG.callback_url
-      })
-    });
-    const invoiceData = await invoiceResponse.json();
-    const invoiceId = invoiceData.invoice_id;
-    const qrCode = invoiceData.qr_image;
-
-    qrImage.src = qrCode;
-    statusText.innerText = "QR кодыг уншуулж төлбөрөө хийнэ үү";
-
-    const checkPayment = setInterval(async () => {
-      const paymentResponse = await fetch(`${QPAY_CONFIG.api_url}/payment/${invoiceId}`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${accessToken}`
-        }
-      });
-      const paymentData = await paymentResponse.json();
-      if (paymentData.payment_status === "PAID") {
-        statusText.innerText = "Төлбөр амжилттай хийгдлээ!";
-        clearInterval(checkPayment);
-        setTimeout(closeQPayModal, 2000);
-      } else if (paymentData.payment_status === "CANCELLED") {
-        statusText.innerText = "Төлбөр цуцлагдлаа.";
-        clearInterval(checkPayment);
-        setTimeout(closeQPayModal, 2000);
-      }
-    }, 5000);
+    codeDisplay.innerText = uniqueCode;
   } catch (error) {
-    statusText.innerText = "Алдаа гарлаа: " + error.message;
+    codeDisplay.innerText = "Алдаа гарлаа: " + error.message;
     console.error(error);
   }
 }
 
-// Close QPay modal
-function closeQPayModal(){
-  document.getElementById("qpayModal").style.display = "none";
+// Close code modal
+function closeCodeModal() {
+  document.getElementById("codeModal").style.display = "none";
 }
 </script>
 
