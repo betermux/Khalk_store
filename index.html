@@ -144,11 +144,11 @@ button:focus {
 /* Add-to-cart button panel */
 .product-panel {
   position: absolute;
-  bottom: 10px; /* Зургийн доод хэсэгт ойртоно */
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   display: none;
-  gap: 8px; /* Товч хоорондын зайг нэмэгдүүлсэн */
+  gap: 8px;
   opacity: 0;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
@@ -240,7 +240,7 @@ button:focus {
 #sidebar {
   position: fixed;
   top: 0;
-  left: -350px; /* Бүрэн далдрах */
+  left: -350px;
   width: 300px;
   height: 100%;
   background: #1c1c1c;
@@ -250,7 +250,7 @@ button:focus {
   box-shadow: 2px 0 10px rgba(0,0,0,0.5);
 }
 #sidebar.active {
-  left: 0; /* Нээгдэхэд зүүн талаас баруун тийш гарч ирнэ */
+  left: 0;
 }
 #sidebar ul {
   list-style: none;
@@ -623,32 +623,32 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
-const db = firebase.firestore(); // db-г энд тодорхойлсон
+const db = firebase.firestore();
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 // Show page
-function showPage(pageId){
+function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   const sidebar = document.getElementById('sidebar');
   if (sidebar.classList.contains('active')) {
-    toggleSidebar(); // Хуудсыг сонгочихоод sidebar-ыг хаах
+    toggleSidebar();
   }
 }
 
 // Cart page
-function openCart(){
+function openCart() {
   showPage('cartPage');
   renderCart();
 }
 
-function backToShop(){
-  showPage('homePage'); // Анхдагчаар Home Page хуудсыг харуулах
+function backToShop() {
+  showPage('homePage');
 }
 
 // Toggle sidebar
-function toggleSidebar(){
+function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
   if (sidebar.classList.contains('active')) {
     sidebar.style.animation = 'sidebarOut 0.3s forwards';
@@ -660,29 +660,31 @@ function toggleSidebar(){
 }
 
 // Add to cart with scale effect
-function addToCart(img, price){
-  const productEl = document.querySelectorAll('.product img[src="'+img+'"]')[0].parentElement;
+function addToCart(img, price) {
+  const productEl = document.querySelector(`.product img[src="${img}"]`).parentElement;
   productEl.style.transform = 'scale(1.05)';
-  setTimeout(() => { productEl.style.transform='scale(1)'; }, 300);
+  setTimeout(() => { productEl.style.transform = 'scale(1)'; }, 300);
 
-  cart.push({img, price});
+  // Барааг сагсанд нэмэх
+  cart.push({ img, price });
   localStorage.setItem("cart", JSON.stringify(cart));
   renderNotification("Бараа сагсанд нэмэгдлээ!");
+  renderCart(); // Сагсыг дахин харуулах
 }
 
 // Render cart
-function renderCart(){
+function renderCart() {
   const container = document.getElementById("cartItems");
   const empty = document.getElementById("cartEmpty");
   container.innerHTML = "";
-  
-  if(cart.length === 0){
+
+  if (cart.length === 0) {
     empty.style.display = "block";
     return;
   }
-  
+
   empty.style.display = "none";
-  
+
   cart.forEach((item, index) => {
     const div = document.createElement("div");
     div.className = "cart-item";
@@ -693,20 +695,20 @@ function renderCart(){
 }
 
 // Delete item
-function deleteItem(index){
+function deleteItem(index) {
   cart.splice(index, 1);
   localStorage.setItem("cart", JSON.stringify(cart));
   renderCart();
 }
 
 // Notification animation
-function renderNotification(msg){
+function renderNotification(msg) {
   const notify = document.getElementById("notify");
   notify.innerText = msg;
   notify.style.display = "block";
   notify.style.animation = "notifyIn 0.3s forwards";
   setTimeout(() => { notify.style.animation = "notifyOut 0.3s forwards"; }, 1500);
-  setTimeout(() => { notify.style.display="none"; }, 1800);
+  setTimeout(() => { notify.style.display = "none"; }, 1800);
 }
 
 // Generate unique 6-character code
@@ -721,7 +723,6 @@ async function generateUniqueCode() {
   const codeRef = db.collection('paymentCodes').doc(code);
   const doc = await codeRef.get();
   if (doc.exists) {
-    // If code exists, try generating a new one
     return generateUniqueCode();
   }
   return code;
