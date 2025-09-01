@@ -37,6 +37,7 @@ header img.cart{width:28px;height:28px;cursor:pointer;}
 .product:nth-child(2) {animation-delay: 0.2s;}
 .product:nth-child(3) {animation-delay: 0.3s;}
 .product:nth-child(4) {animation-delay: 0.4s;}
+.product:nth-child(5) {animation-delay: 0.5s;} /* Шинэ барааны хувьд */
 .product img {
   width:100%; 
   border-radius:12px; 
@@ -57,16 +58,16 @@ button {
   cursor:pointer; 
   margin-top:6px;
   transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-  outline: none; /* Цэнхэр хүрээг хасах */
+  outline: none;
 }
 button:hover {
   background:#0056b3; 
   transform: scale(1.05);
-  box-shadow: 0 2px 8px rgba(0,123,255,0.3); /* Зөөлөн эффект */
+  box-shadow: 0 2px 8px rgba(0,123,255,0.3);
 }
 button:focus {
-  outline: none; /* Цэнхэр хүрээг хасах */
-  box-shadow: 0 0 8px rgba(0,123,255,0.5); /* Focus дээр зөөлөн эффект */
+  outline: none;
+  box-shadow: 0 0 8px rgba(0,123,255,0.5);
 }
 
 .page{display:none;}
@@ -142,7 +143,7 @@ button:focus {
   font-weight: 500;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-  outline: none; /* Цэнхэр хүрээг хасах */
+  outline: none;
 }
 .product-panel button:nth-child(1) { /* Сагсанд нэмэх */
   background: #1c1c1c;
@@ -154,8 +155,8 @@ button:focus {
   opacity: 0.9;
 }
 .product-panel button:nth-child(1):focus {
-  outline: none; /* Цэнхэр хүрээг хасах */
-  box-shadow: 0 0 8px rgba(255,0,0,0.5); /* Focus дээр зөөлөн эффект */
+  outline: none;
+  box-shadow: 0 0 8px rgba(255,0,0,0.5);
 }
 .product-panel button:nth-child(2) { /* Захиалах */
   background: linear-gradient(45deg, #ff4d4d, #ff1a1a);
@@ -166,8 +167,8 @@ button:focus {
   opacity: 0.9;
 }
 .product-panel button:nth-child(2):focus {
-  outline: none; /* Цэнхэр хүрээг хасах */
-  box-shadow: 0 0 8px rgba(255,0,0,0.5); /* Focus дээр зөөлөн эффект */
+  outline: none;
+  box-shadow: 0 0 8px rgba(255,0,0,0.5);
 }
 
 /* Panel in/out animations */
@@ -219,6 +220,14 @@ button:focus {
       <div class="price">₮154,000 <span class="old-price">₮214,000</span></div>
       <div class="product-panel">
         <button onclick="event.stopPropagation(); addToCart('assets/baraa4.png','₮154,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa5.png" alt="Baraa5">
+      <div class="price">₮151,000 <span class="old-price">₮185,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa5.png','₮151,000')">Сагсанд нэмэх</button>
         <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
       </div>
     </div>
