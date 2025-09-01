@@ -233,7 +233,7 @@ button:focus {
 #sidebar {
   position: fixed;
   top: 0;
-  left: -280px; /* Хаалттай үед 20px харагдана */
+  left: -300px; /* Бүрэн далдрах */
   width: 300px;
   height: 100%;
   background: #1c1c1c;
@@ -272,12 +272,12 @@ button:focus {
 
 /* Sidebar animations */
 @keyframes sidebarIn {
-  from {left: -280px;}
+  from {left: -300px;}
   to {left: 0;}
 }
 @keyframes sidebarOut {
   from {left: 0;}
-  to {left: -280px;}
+  to {left: -300px;}
 }
 </style>
 </head>
@@ -570,7 +570,10 @@ const QPAY_CONFIG = {
 function showPage(pageId){
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
-  toggleSidebar(); // Хуудсыг сонгочихоод sidebar-ыг хаах
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar.classList.contains('active')) {
+    toggleSidebar(); // Хуудсыг сонгочихоод sidebar-ыг хаах
+  }
 }
 
 // Cart page
