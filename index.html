@@ -8,7 +8,7 @@
 <style>
 body {margin:0; padding:0; font-family:Arial,sans-serif; background:#111; color:#eee;}
 header {padding:15px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #222;}
-header img.logo{width:40px;height:40px;}
+header img.logo{width:40px;height:40px;cursor:pointer;}
 header .logo-container {display:flex; align-items:center; gap:10px;}
 header .logo-text {font-family: 'Cinzel', serif; font-size:18px; font-weight:700; color:#fff; text-transform:uppercase;}
 header img.cart{width:28px;height:28px;cursor:pointer;}
@@ -37,7 +37,7 @@ header img.cart{width:28px;height:28px;cursor:pointer;}
 .product:nth-child(2) {animation-delay: 0.2s;}
 .product:nth-child(3) {animation-delay: 0.3s;}
 .product:nth-child(4) {animation-delay: 0.4s;}
-.product:nth-child(5) {animation-delay: 0.5s;} /* Шинэ барааны хувьд */
+.product:nth-child(5) {animation-delay: 0.5s;}
 .product img {
   width:100%; 
   border-radius:12px; 
@@ -145,7 +145,7 @@ button:focus {
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
   outline: none;
 }
-.product-panel button:nth-child(1) { /* Сагсанд нэмэх */
+.product-panel button:nth-child(1) {
   background: #1c1c1c;
   border: 2px solid #ff4d4d;
 }
@@ -158,7 +158,7 @@ button:focus {
   outline: none;
   box-shadow: 0 0 8px rgba(255,0,0,0.5);
 }
-.product-panel button:nth-child(2) { /* Захиалах */
+.product-panel button:nth-child(2) {
   background: linear-gradient(45deg, #ff4d4d, #ff1a1a);
 }
 .product-panel button:nth-child(2):hover {
@@ -176,27 +176,122 @@ button:focus {
   from {opacity: 0; transform: translateX(-50%) scale(0.8);}
   to {opacity: 1; transform: translateX(-50%) scale(1);}
 }
+
+/* QR code modal */
+#qpayModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+}
+.qpay-modal-content {
+  background: #1c1c1c;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  width: 300px;
+  color: #fff;
+}
+.qpay-modal-content img {
+  width: 200px;
+  height: 200px;
+  margin: 10px auto;
+}
+.qpay-modal-content button {
+  background: #ff4d4d;
+  padding: 10px 20px;
+  border-radius: 8px;
+}
+
+/* Sidebar */
+#sidebar {
+  position: fixed;
+  top: 0;
+  right: -300px; /* Хаалттай үед баруунаас харагдахгүй */
+  width: 300px;
+  height: 100%;
+  background: #1c1c1c;
+  z-index: 1500;
+  transition: right 0.3s ease;
+  padding: 20px;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+}
+#sidebar.active {
+  right: 0; /* Нээгдэхэд баруунаас зүүн тийш гарч ирнэ */
+}
+#sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#sidebar li {
+  padding: 15px;
+  font-size: 18px;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+#sidebar li:hover {
+  background: #ff4d4d;
+  border-radius: 8px;
+}
+#sidebar .close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 24px;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Sidebar animations */
+@keyframes sidebarIn {
+  from {right: -300px;}
+  to {right: 0;}
+}
+@keyframes sidebarOut {
+  from {right: 0;}
+  to {right: -300px;}
+}
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo-container">
-    <img src="assets/khalk.png" class="logo" alt="Logo">
+    <img src="assets/khalk.png" class="logo" alt="Logo" onclick="toggleSidebar()">
     <span class="logo-text">Khalk Store</span>
   </div>
   <img src="assets/cart.png" class="cart" alt="Cart" onclick="openCart()">
 </header>
 
-<!-- Products Page -->
-<div id="productsPage" class="page active">
+<!-- Sidebar -->
+<div id="sidebar">
+  <span class="close-btn" onclick="toggleSidebar()">×</span>
+  <ul>
+    <li onclick="showPage('bestSellerPage')">Best Seller</li>
+    <li onclick="showPage('hoodiePage')">Hoodie</li>
+    <li onclick="showPage('sweaterPage')">Sweater</li>
+    <li onclick="showPage('pantsPage')">Pants</li>
+    <li onclick="showPage('accessoriesPage')">Accessories</li>
+  </ul>
+</div>
+
+<!-- Best Seller Page -->
+<div id="bestSellerPage" class="page active">
   <div class="products">
     <div class="product">
       <img src="assets/baraa1.png" alt="Baraa1">
       <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
       <div class="product-panel">
         <button onclick="event.stopPropagation(); addToCart('assets/baraa1.png','₮121,000')">Сагсанд нэмэх</button>
-        <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa1.png','121000')">Захиалах</button>
       </div>
     </div>
     <div class="product">
@@ -204,7 +299,7 @@ button:focus {
       <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
       <div class="product-panel">
         <button onclick="event.stopPropagation(); addToCart('assets/baraa2.png','₮177,000')">Сагсанд нэмэх</button>
-        <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa2.png','177000')">Захиалах</button>
       </div>
     </div>
     <div class="product">
@@ -212,7 +307,7 @@ button:focus {
       <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
         <button onclick="event.stopPropagation(); addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
-        <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa3.png','153000')">Захиалах</button>
       </div>
     </div>
     <div class="product">
@@ -220,7 +315,7 @@ button:focus {
       <div class="price">₮154,000 <span class="old-price">₮214,000</span></div>
       <div class="product-panel">
         <button onclick="event.stopPropagation(); addToCart('assets/baraa4.png','₮154,000')">Сагсанд нэмэх</button>
-        <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa4.png','154000')">Захиалах</button>
       </div>
     </div>
     <div class="product">
@@ -228,7 +323,191 @@ button:focus {
       <div class="price">₮151,000 <span class="old-price">₮185,000</span></div>
       <div class="product-panel">
         <button onclick="event.stopPropagation(); addToCart('assets/baraa5.png','₮151,000')">Сагсанд нэмэх</button>
-        <button onclick="event.stopPropagation(); openOrder()">Захиалах</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa5.png','151000')">Захиалах</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hoodie Page -->
+<div id="hoodiePage" class="page">
+  <div class="products">
+    <div class="product">
+      <img src="assets/baraa1.png" alt="Baraa1">
+      <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa1.png','₮121,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa1.png','121000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa2.png" alt="Baraa2">
+      <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa2.png','₮177,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa2.png','177000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa3.png" alt="Baraa3">
+      <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa3.png','153000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa4.png" alt="Baraa4">
+      <div class="price">₮154,000 <span class="old-price">₮214,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa4.png','₮154,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa4.png','154000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa5.png" alt="Baraa5">
+      <div class="price">₮151,000 <span class="old-price">₮185,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa5.png','₮151,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa5.png','151000')">Захиалах</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sweater Page -->
+<div id="sweaterPage" class="page">
+  <div class="products">
+    <div class="product">
+      <img src="assets/baraa1.png" alt="Baraa1">
+      <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa1.png','₮121,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa1.png','121000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa2.png" alt="Baraa2">
+      <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa2.png','₮177,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa2.png','177000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa3.png" alt="Baraa3">
+      <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa3.png','153000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa4.png" alt="Baraa4">
+      <div class="price">₮154,000 <span class="old-price">₮214,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa4.png','₮154,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa4.png','154000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa5.png" alt="Baraa5">
+      <div class="price">₮151,000 <span class="old-price">₮185,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa5.png','₮151,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa5.png','151000')">Захиалах</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pants Page -->
+<div id="pantsPage" class="page">
+  <div class="products">
+    <div class="product">
+      <img src="assets/baraa1.png" alt="Baraa1">
+      <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa1.png','₮121,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa1.png','121000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa2.png" alt="Baraa2">
+      <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa2.png','₮177,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa2.png','177000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa3.png" alt="Baraa3">
+      <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa3.png','153000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa4.png" alt="Baraa4">
+      <div class="price">₮154,000 <span class="old-price">₮214,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa4.png','₮154,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa4.png','154000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa5.png" alt="Baraa5">
+      <div class="price">₮151,000 <span class="old-price">₮185,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa5.png','₮151,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa5.png','151000')">Захиалах</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Accessories Page -->
+<div id="accessoriesPage" class="page">
+  <div class="products">
+    <div class="product">
+      <img src="assets/baraa1.png" alt="Baraa1">
+      <div class="price">₮121,000 <span class="old-price">₮149,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa1.png','₮121,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa1.png','121000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa2.png" alt="Baraa2">
+      <div class="price">₮177,000 <span class="old-price">₮210,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa2.png','₮177,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa2.png','177000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa3.png" alt="Baraa3">
+      <div class="price">₮153,000 <span class="old-price">₮185,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa3.png','₮153,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa3.png','153000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa4.png" alt="Baraa4">
+      <div class="price">₮154,000 <span class="old-price">₮214,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa4.png','₮154,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa4.png','154000')">Захиалах</button>
+      </div>
+    </div>
+    <div class="product">
+      <img src="assets/baraa5.png" alt="Baraa5">
+      <div class="price">₮151,000 <span class="old-price">₮185,000</span></div>
+      <div class="product-panel">
+        <button onclick="event.stopPropagation(); addToCart('assets/baraa5.png','₮151,000')">Сагсанд нэмэх</button>
+        <button onclick="event.stopPropagation(); openOrder('assets/baraa5.png','151000')">Захиалах</button>
       </div>
     </div>
   </div>
@@ -244,23 +523,55 @@ button:focus {
 <!-- Notification -->
 <div id="notify"></div>
 
+<!-- QPay Modal -->
+<div id="qpayModal">
+  <div class="qpay-modal-content">
+    <h3>Төлбөр хийх</h3>
+    <p>Доорх QR кодыг уншуулж төлбөрөө хийнэ үү</p>
+    <img id="qpayQR" src="" alt="QPay QR Code">
+    <p id="qpayStatus">Төлбөрийг хүлээж байна...</p>
+    <button onclick="closeQPayModal()">Хаах</button>
+  </div>
+</div>
+
 <script>
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+// QPay API configurations (Таны мэдээллийг оруулна уу)
+const QPAY_CONFIG = {
+  invoice_code: "YOUR_INVOICE_CODE",
+  client_id: "YOUR_CLIENT_ID",
+  client_secret: "YOUR_CLIENT_SECRET",
+  callback_url: "https://yourwebsite.com/payments",
+  api_url: "https://merchant-sandbox.qpay.mn/v2"
+};
 
 // Show page
 function showPage(pageId){
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
+  toggleSidebar(); // Хуудсыг сонгочихоод sidebar-ыг хаах
 }
 
 // Cart page
 function openCart(){
   showPage('cartPage');
-  renderCart();
 }
 
 function backToShop(){
-  showPage('productsPage');
+  showPage('bestSellerPage'); // Анхдагчаар Best Seller хуудсыг харуулах
+}
+
+// Toggle sidebar
+function toggleSidebar(){
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar.classList.contains('active')) {
+    sidebar.style.animation = 'sidebarOut 0.3s forwards';
+    setTimeout(() => { sidebar.classList.remove('active'); }, 300);
+  } else {
+    sidebar.classList.add('active');
+    sidebar.style.animation = 'sidebarIn 0.3s forwards';
+  }
 }
 
 // Add to cart with scale effect
@@ -313,9 +624,75 @@ function renderNotification(msg){
   setTimeout(() => { notify.style.display="none"; }, 1800);
 }
 
-// Order placeholder
-function openOrder(){
-  alert("Захиалга хийх popup");
+// QPay order processing
+async function openOrder(img, amount){
+  const modal = document.getElementById("qpayModal");
+  const qrImage = document.getElementById("qpayQR");
+  const statusText = document.getElementById("qpayStatus");
+  modal.style.display = "flex";
+  qrImage.src = "";
+  statusText.innerText = "Төлбөрийг хүлээж байна...";
+
+  try {
+    const tokenResponse = await fetch(`${QPAY_CONFIG.api_url}/auth/token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Basic " + btoa(`${QPAY_CONFIG.client_id}:${QPAY_CONFIG.client_secret}`)
+      }
+    });
+    const tokenData = await tokenResponse.json();
+    const accessToken = tokenData.access_token;
+
+    const invoiceResponse = await fetch(`${QPAY_CONFIG.api_url}/invoice`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({
+        invoice_code: QPAY_CONFIG.invoice_code,
+        sender_invoice_no: `INV-${Date.now()}`,
+        invoice_receiver_code: "terminal",
+        invoice_description: `Төлбөр: ${img}`,
+        amount: parseFloat(amount),
+        callback_url: QPAY_CONFIG.callback_url
+      })
+    });
+    const invoiceData = await invoiceResponse.json();
+    const invoiceId = invoiceData.invoice_id;
+    const qrCode = invoiceData.qr_image;
+
+    qrImage.src = qrCode;
+    statusText.innerText = "QR кодыг уншуулж төлбөрөө хийнэ үү";
+
+    const checkPayment = setInterval(async () => {
+      const paymentResponse = await fetch(`${QPAY_CONFIG.api_url}/payment/${invoiceId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`
+        }
+      });
+      const paymentData = await paymentResponse.json();
+      if (paymentData.payment_status === "PAID") {
+        statusText.innerText = "Төлбөр амжилттай хийгдлээ!";
+        clearInterval(checkPayment);
+        setTimeout(closeQPayModal, 2000);
+      } else if (paymentData.payment_status === "CANCELLED") {
+        statusText.innerText = "Төлбөр цуцлагдлаа.";
+        clearInterval(checkPayment);
+        setTimeout(closeQPayModal, 2000);
+      }
+    }, 5000);
+  } catch (error) {
+    statusText.innerText = "Алдаа гарлаа: " + error.message;
+    console.error(error);
+  }
+}
+
+// Close QPay modal
+function closeQPayModal(){
+  document.getElementById("qpayModal").style.display = "none";
 }
 </script>
 
