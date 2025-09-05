@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Khalk Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
-<!-- OLD Firebase SDK script tags REMOVED -->
+<!-- Firebase SDK - Updated to a stable v9.x.x version -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js"></script>
 <style>
 body {margin:0; padding:0; font-family:Arial,sans-serif; background:#111; color:#eee;}
 header {
@@ -604,18 +607,12 @@ button:focus {
   </div>
 </div>
 
-<!-- Main JavaScript with Modular Firebase SDK -->
-<script type="module">
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
-import { getFirestore, collection, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
-let db; // Firestore instance
-let analytics; // Analytics instance
+<script>
+// Declare db globally but don't initialize it yet
+let db; 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-// Your web app's Firebase configuration
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAEybA-Ou_PGkZINDT-opzVPUlrr6XOU8E",
   authDomain: "khalkh-store.firebaseapp.com",
@@ -627,14 +624,16 @@ const firebaseConfig = {
   measurementId: "G-6M9HZM8G9N"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-analytics = getAnalytics(app); // Assign analytics instance
-db = getFirestore(app); // Assign db instance
-console.log("Firebase Modular SDK and Firestore initialized."); // For debugging
+// Initialize Firebase and Firestore directly.
+// This script block is placed at the end of <body>, ensuring SDKs are loaded.
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
+db = firebase.firestore(); // Assign db here, after Firebase app is initialized
+console.log("Firebase and Firestore initialized."); // For debugging
 
 // Initial render of the cart when the page loads
-document.addEventListener('DOMContentLoaded', renderCart);
+// This will run after the script has executed and db is initialized.
+renderCart();
 
 
 // Show page
@@ -693,7 +692,7 @@ function renderCart() {
     return;
   }
 
-  empty.style.display = "none";
+empty.style.display = "none";
 
   cart.forEach((item, index) => {
     const div = document.createElement("div");
@@ -730,10 +729,10 @@ async function generateUniqueCode() {
   }
 
   // Check if code exists in Firestore
-  // Use getDoc and doc from modular SDK
-  const codeRef = doc(db, 'paymentCodes', code);
-  const docSnap = await getDoc(codeRef); // Use getDoc for modular
-  if (docSnap.exists()) { // Check if document exists
+  // This check is now more robust as db should be initialized
+  const codeRef = db.collection('paymentCodes').doc(code);
+  const doc = await codeRef.get();
+  if (doc.exists) {
     // If code exists, generate a new one recursively
     return generateUniqueCode();
   }
@@ -748,13 +747,13 @@ async function openOrder(img, amount) {
   modal.style.display = "flex"; // Show the modal
 
   try {
+    // No need for explicit 'if (!db)' check here if script placement is correct
     const uniqueCode = await generateUniqueCode();
     
-    // Use setDoc and doc from modular SDK
-    await setDoc(doc(db, 'paymentCodes', uniqueCode), {
+    await db.collection('paymentCodes').doc(uniqueCode).set({
       image: img,
       amount: parseFloat(amount),
-      createdAt: serverTimestamp() // Use serverTimestamp from modular SDK
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     codeDisplay.innerText = uniqueCode; // Display the generated code
     renderNotification("Захиалга амжилттай үүслээ!");
