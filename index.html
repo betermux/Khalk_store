@@ -624,14 +624,16 @@ const firebaseConfig = {
   measurementId: "G-6M9HZM8G9N"
 };
 
-// Initialize Firebase and Firestore once the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-  firebase.initializeApp(firebaseConfig);
-  firebase.analytics();
-  db = firebase.firestore(); // Assign db here, after Firebase app is initialized
-  console.log("Firebase and Firestore initialized."); // For debugging
-  renderCart(); // Initial render of the cart when the page loads
-});
+// Initialize Firebase and Firestore directly.
+// This script block is placed at the end of <body>, ensuring SDKs are loaded.
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
+db = firebase.firestore(); // Assign db here, after Firebase app is initialized
+console.log("Firebase and Firestore initialized."); // For debugging
+
+// Initial render of the cart when the page loads
+// This will run after the script has executed and db is initialized.
+renderCart();
 
 
 // Show page
@@ -727,10 +729,7 @@ async function generateUniqueCode() {
   }
 
   // Check if code exists in Firestore
-  // Ensure 'db' is defined before using it
-  if (!db) {
-    throw new Error("Firestore (db) is not initialized.");
-  }
+  // This check is now more robust as db should be initialized
   const codeRef = db.collection('paymentCodes').doc(code);
   const doc = await codeRef.get();
   if (doc.exists) {
@@ -748,10 +747,7 @@ async function openOrder(img, amount) {
   modal.style.display = "flex"; // Show the modal
 
   try {
-    // Ensure 'db' is defined before using it
-    if (!db) {
-      throw new Error("Firestore (db) is not initialized. Please check Firebase setup.");
-    }
+    // No need for explicit 'if (!db)' check here if script placement is correct
     const uniqueCode = await generateUniqueCode();
     
     await db.collection('paymentCodes').doc(uniqueCode).set({
