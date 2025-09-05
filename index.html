@@ -608,6 +608,10 @@ button:focus {
 </div>
 
 <script>
+// Declare db globally but don't initialize it yet
+let db; 
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAEybA-Ou_PGkZINDT-opzVPUlrr6XOU8E",
@@ -620,13 +624,15 @@ const firebaseConfig = {
   measurementId: "G-6M9HZM8G9N"
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-firebase.analytics();
-// Ensure firestore is initialized after the app
-const db = firebase.firestore(); 
+// Initialize Firebase and Firestore once the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+  db = firebase.firestore(); // Assign db here, after Firebase app is initialized
+  console.log("Firebase and Firestore initialized."); // For debugging
+  renderCart(); // Initial render of the cart when the page loads
+});
 
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 // Show page
 function showPage(pageId) {
@@ -684,7 +690,7 @@ function renderCart() {
     return;
   }
 
-  empty.style.display = "none";
+empty.style.display = "none";
 
   cart.forEach((item, index) => {
     const div = document.createElement("div");
@@ -721,7 +727,10 @@ async function generateUniqueCode() {
   }
 
   // Check if code exists in Firestore
-  // This part assumes 'db' is correctly initialized and accessible.
+  // Ensure 'db' is defined before using it
+  if (!db) {
+    throw new Error("Firestore (db) is not initialized.");
+  }
   const codeRef = db.collection('paymentCodes').doc(code);
   const doc = await codeRef.get();
   if (doc.exists) {
@@ -739,8 +748,12 @@ async function openOrder(img, amount) {
   modal.style.display = "flex"; // Show the modal
 
   try {
+    // Ensure 'db' is defined before using it
+    if (!db) {
+      throw new Error("Firestore (db) is not initialized. Please check Firebase setup.");
+    }
     const uniqueCode = await generateUniqueCode();
-    // Ensure 'db' is defined and Firebase is initialized correctly
+    
     await db.collection('paymentCodes').doc(uniqueCode).set({
       image: img,
       amount: parseFloat(amount),
@@ -759,9 +772,6 @@ async function openOrder(img, amount) {
 function closeCodeModal() {
   document.getElementById("codeModal").style.display = "none";
 }
-
-// Initial render of the cart when the page loads
-document.addEventListener('DOMContentLoaded', renderCart);
 </script>
 
 </body>
