@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Khalk Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js"></script>
+<!-- Firebase SDK - Updated to a stable v9.x.x version -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js"></script>
 <style>
 body {margin:0; padding:0; font-family:Arial,sans-serif; background:#111; color:#eee;}
 header {
@@ -623,7 +623,8 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
-const db = firebase.firestore();
+// Ensure firestore is initialized after the app
+const db = firebase.firestore(); 
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
@@ -640,7 +641,7 @@ function showPage(pageId) {
 // Cart page
 function openCart() {
   showPage('cartPage');
-  renderCart();
+  renderCart(); // Ensure cart is rendered when opened
 }
 
 function backToShop() {
@@ -669,7 +670,7 @@ function addToCart(img, price) {
   cart.push({ img, price });
   localStorage.setItem("cart", JSON.stringify(cart));
   renderNotification("Бараа сагсанд нэмэгдлээ!");
-  renderCart(); // Сагсыг дахин харуулах
+  renderCart(); // Ensure cart is rendered after adding an item
 }
 
 // Render cart
@@ -698,7 +699,7 @@ function renderCart() {
 function deleteItem(index) {
   cart.splice(index, 1);
   localStorage.setItem("cart", JSON.stringify(cart));
-  renderCart();
+  renderCart(); // Ensure cart is rendered after deleting an item
 }
 
 // Notification animation
@@ -720,9 +721,11 @@ async function generateUniqueCode() {
   }
 
   // Check if code exists in Firestore
+  // This part assumes 'db' is correctly initialized and accessible.
   const codeRef = db.collection('paymentCodes').doc(code);
   const doc = await codeRef.get();
   if (doc.exists) {
+    // If code exists, generate a new one recursively
     return generateUniqueCode();
   }
   return code;
@@ -732,21 +735,23 @@ async function generateUniqueCode() {
 async function openOrder(img, amount) {
   const modal = document.getElementById("codeModal");
   const codeDisplay = document.getElementById("paymentCode");
-  codeDisplay.innerText = "Кодыг үүсгэж байна...";
-  modal.style.display = "flex";
+  codeDisplay.innerText = "Кодыг үүсгэж байна..."; // Show loading message
+  modal.style.display = "flex"; // Show the modal
 
   try {
     const uniqueCode = await generateUniqueCode();
+    // Ensure 'db' is defined and Firebase is initialized correctly
     await db.collection('paymentCodes').doc(uniqueCode).set({
       image: img,
       amount: parseFloat(amount),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    codeDisplay.innerText = uniqueCode;
+    codeDisplay.innerText = uniqueCode; // Display the generated code
     renderNotification("Захиалга амжилттай үүслээ!");
   } catch (error) {
-    codeDisplay.innerText = "Алдаа гарлаа: " + error.message;
-    console.error(error);
+    codeDisplay.innerText = "Алдаа гарлаа: " + error.message; // Display error message
+    console.error("Error generating or saving order code:", error);
+    renderNotification("Захиалга үүсгэхэд алдаа гарлаа!");
   }
 }
 
@@ -754,6 +759,9 @@ async function openOrder(img, amount) {
 function closeCodeModal() {
   document.getElementById("codeModal").style.display = "none";
 }
+
+// Initial render of the cart when the page loads
+document.addEventListener('DOMContentLoaded', renderCart);
 </script>
 
 </body>
