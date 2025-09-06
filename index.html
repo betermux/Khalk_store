@@ -10,7 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script> <!-- Realtime Database SDK -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
 <style>
-body {margin:0; padding:0; font-family:Arial,sans-serif; background:#111; color:#eee;}
+body {margin:0; padding:0; font-family:Arial,sans-serif; background:#000; color:#eee;} /* Арын өнгийг тас хар болгосон */
 header {
   padding:15px; 
   display:flex; 
@@ -21,7 +21,7 @@ header {
   transform: rotateY(90deg);
   animation: rotateIn 0.5s ease forwards;
   position: relative; /* For current-page-display positioning */
-  padding-bottom: 30px; /* Хуудасны нэрэнд зай гаргах */
+  padding-bottom: 15px; /* Баннерны зайг тохируулахын тулд багасгасан */
 }
 header img.logo{width:40px;height:40px;cursor:pointer;}
 header .logo-container {
@@ -41,7 +41,7 @@ header .logo-text {
 }
 header .menu-text { /* "Menu" текстэнд зориулсан CSS */
   position: absolute; /* Логоны доор байрлуулах */
-  top: 40px; /* Логоны яг доор байрлуулахын тулд тохируулсан */
+  top: 50px; /* Логоны яг доор байрлуулахын тулд тохируулсан */
   left: 20px; /* Логоны зүүн ирмэгтэй тааруулах */
   font-size: 10px; /* Жижиг хэмжээ */
   color: #ccc; /* Бүдэг өнгө */
@@ -55,7 +55,7 @@ header img.cart{width:28px;height:28px;}
 .cart-count { /* Сагсны тоолуурын CSS */
   position: absolute;
   top: -4px; /* Дээшлүүлсэн (2x жижиг болгосон) */
-  right: -4px; /* Баруун тийшлүүлсэн (2x жижиг болгосон) */
+  right: -4px; /* Баруун тийшлүүлүүлсэн (2x жижиг болгосон) */
   background: linear-gradient(45deg, #ff0000, #cc0000); /* Илүү тод улаан өнгө */
   color: white;
   border-radius: 50%;
@@ -70,20 +70,58 @@ header img.cart{width:28px;height:28px;}
   display: none; /* Эхлээд нууцлагдсан байна */
 }
 
-/* Current Page Display */
+/* Current Page Display - Баннер дотор байрлах тул header-аас хассан */
 #current-page-display {
+  display: none;
+}
+
+/* Banner Styles */
+.banner {
+  position: relative;
+  width: 100%;
+  height: 200px; /* Баннерны өндөр */
+  overflow: hidden;
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateY(50px);
+  animation: bannerFadeIn 0.8s ease forwards;
+}
+.banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   position: absolute;
-  bottom: 5px; /* Header-ын доод хэсэгт байрлуулах */
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 14px;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+.banner::after { /* Доороос хар өнгөөр бүдгэрэх эффект */
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%; /* Бүдгэрэх хэсгийн өндөр */
+  background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0));
+  z-index: 2;
+}
+.banner h1 {
+  position: absolute;
+  bottom: 20px; /* Доод талаас зай */
+  left: 20px; /* Зүүн талаас зай */
   color: #fff;
-  font-weight: bold;
+  font-family: 'Cinzel', serif;
+  font-size: 36px;
+  font-weight: 700;
   text-transform: uppercase;
-  padding: 5px 10px;
-  background: rgba(0,0,0,0.5);
-  border-radius: 5px;
-  z-index: 500; /* Header-ын доор, бусад зүйлсийн дээр */
+  z-index: 3;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+@keyframes bannerFadeIn {
+  from {opacity: 0; transform: translateY(50px);}
+  to {opacity: 1; transform: translateY(0);}
 }
 
 
@@ -443,6 +481,10 @@ button:focus {
 
 <!-- Home Page -->
 <div id="homePage" class="page active">
+  <div class="banner">
+    <img src="assets/home.png" alt="Home Banner">
+    <h1>Home</h1>
+  </div>
   <div class="products">
     <div class="product">
       <img src="assets/baraa1.png" alt="Baraa1">
@@ -489,6 +531,10 @@ button:focus {
 
 <!-- Best Seller Page -->
 <div id="bestSellerPage" class="page">
+  <div class="banner">
+    <img src="assets/bestseller.png" alt="Best Seller Banner">
+    <h1>Best Seller</h1>
+  </div>
   <div class="products">
     <div class="product">
       <img src="assets/baraa1.png" alt="Baraa1">
@@ -535,6 +581,10 @@ button:focus {
 
 <!-- Hoodie Page -->
 <div id="hoodiePage" class="page">
+  <div class="banner">
+    <img src="assets/hoodie.png" alt="Hoodie Banner">
+    <h1>Hoodie</h1>
+  </div>
   <div class="products">
     <div class="product">
       <img src="assets/baraa1.png" alt="Baraa1">
@@ -581,6 +631,10 @@ button:focus {
 
 <!-- Sweater Page -->
 <div id="sweaterPage" class="page">
+  <div class="banner">
+    <img src="assets/sweater.png" alt="Sweater Banner">
+    <h1>Sweater</h1>
+  </div>
   <div class="products">
     <div class="product">
       <img src="assets/baraa1.png" alt="Baraa1">
@@ -627,6 +681,10 @@ button:focus {
 
 <!-- Pants Page -->
 <div id="pantsPage" class="page">
+  <div class="banner">
+    <img src="assets/pants.png" alt="Pants Banner">
+    <h1>Pants</h1>
+  </div>
   <div class="products">
     <div class="product">
       <img src="assets/baraa1.png" alt="Baraa1">
@@ -673,6 +731,10 @@ button:focus {
 
 <!-- Accessories Page -->
 <div id="accessoriesPage" class="page">
+  <div class="banner">
+    <img src="assets/accessories.png" alt="Accessories Banner">
+    <h1>Accessories</h1>
+  </div>
   <div class="products">
     <div class="product">
       <img src="assets/baraa1.png" alt="Baraa1">
@@ -859,43 +921,47 @@ function showPage(pageId) {
   if (sidebar.classList.contains('active')) {
     toggleSidebar();
   }
-  updateCurrentPageDisplay(pageId); // Хуудасны нэрийг шинэчлэх
+  // updateBannerTitle(pageId); // Баннерны нэрийг шинэчлэх - одоо HTML дотор шууд байгаа тул хэрэггүй
 }
 
-// Хуудасны нэрийг харуулах функцийг шинэчлэх
-function updateCurrentPageDisplay(pageId) {
-  const displayElement = document.getElementById('current-page-display');
-  let pageName = '';
-  switch (pageId) {
-    case 'homePage':
-      pageName = 'Home';
-      break;
-    case 'addressPage':
-      pageName = 'Хаяг';
-      break;
-    case 'bestSellerPage':
-      pageName = 'Best Seller';
-      break;
-    case 'hoodiePage':
-      pageName = 'Hoodie';
-      break;
-    case 'sweaterPage':
-      pageName = 'Sweater';
-      break;
-    case 'pantsPage':
-      pageName = 'Pants';
-      break;
-    case 'accessoriesPage':
-      pageName = 'Accessories';
-      break;
-    case 'cartPage':
-      pageName = 'Сагс';
-      break;
-    default:
-      pageName = 'Home';
+// Баннерны нэрийг шинэчлэх функц (Одоо HTML дотор шууд байгаа тул энэ функц хэрэггүй болсон)
+/*
+function updateBannerTitle(pageId) {
+  const bannerTitleElement = document.querySelector(`#${pageId} .banner h1`);
+  if (bannerTitleElement) {
+    let title = '';
+    switch (pageId) {
+      case 'homePage':
+        title = 'Home';
+        break;
+      case 'bestSellerPage':
+        title = 'Best Seller';
+        break;
+      case 'hoodiePage':
+        title = 'Hoodie';
+        break;
+      case 'sweaterPage':
+        title = 'Sweater';
+        break;
+      case 'pantsPage':
+        title = 'Pants';
+        break;
+      case 'accessoriesPage':
+        title = 'Accessories';
+        break;
+      case 'cartPage':
+        title = 'Сагс'; // Сагсны хуудас баннергүй байж болно, гэхдээ нэр нь хэрэгтэй бол
+        break;
+      case 'addressPage':
+        title = 'Хаяг'; // Хаягийн хуудас баннергүй байж болно, гэхдээ нэр нь хэрэгтэй бол
+        break;
+      default:
+        title = '';
+    }
+    bannerTitleElement.innerText = title;
   }
-  displayElement.innerText = pageName;
 }
+*/
 
 
 // Cart page
