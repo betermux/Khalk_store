@@ -20,11 +20,58 @@ header {
   opacity: 0;
   transform: rotateY(90deg);
   animation: rotateIn 0.5s ease forwards;
+  position: relative; /* For current-page-display positioning */
 }
 header img.logo{width:40px;height:40px;cursor:pointer;}
-header .logo-container {display:flex; align-items:center; gap:10px;}
+header .logo-container {
+  display:flex; 
+  flex-direction: column; /* Зураг болон текстийг босоо байрлуулах */
+  align-items:center; 
+  gap: 2px; /* Зураг болон текстийн хоорондох зай */
+}
 header .logo-text {font-family: 'Cinzel', serif; font-size:18px; font-weight:700; color:#fff; text-transform:uppercase;}
-header img.cart{width:28px;height:28px;cursor:pointer;}
+header .menu-text { /* "Menu" текстэнд зориулсан CSS */
+  font-size: 10px; /* Жижиг хэмжээ */
+  color: #ccc; /* Бүдэг өнгө */
+  margin-top: -5px; /* Зурагтай ойртуулах */
+}
+header .cart-container { /* Сагсны дүрс болон тоолуурыг багтаах */
+  position: relative;
+  cursor: pointer;
+}
+header img.cart{width:28px;height:28px;}
+.cart-count { /* Сагсны тоолуурын CSS */
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #ff4d4d; /* Улаан өнгө */
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 18px; /* Тоо нэмэгдэхэд хэлбэрээ хадгалах */
+  text-align: center;
+  line-height: 14px; /* Босоо тэгшлэх */
+  display: none; /* Эхлээд нууцлагдсан байна */
+}
+
+/* Current Page Display */
+#current-page-display {
+  position: absolute;
+  top: 15px; /* Header-ын доор байрлуулах */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  color: #fff;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 5px;
+  z-index: 500; /* Header-ын доор, бусад зүйлсийн дээр */
+}
+
 
 /* Products grid like Shopify */
 .products {
@@ -356,16 +403,20 @@ button:focus {
 <header>
   <div class="logo-container">
     <img src="assets/khalk.png" class="logo" alt="Logo" onclick="toggleSidebar()">
-    <span class="logo-text">Khalk Store</span>
+    <span class="menu-text">Menu</span> <!-- "Menu" текст нэмсэн -->
   </div>
-  <img src="assets/cart.png" class="cart" alt="Cart" onclick="openCart()">
+  <div class="cart-container" onclick="openCart()"> <!-- Сагсны дүрс болон тоолуурыг багтаах div -->
+    <img src="assets/cart.png" class="cart" alt="Cart">
+    <span class="cart-count" id="cartCount">0</span> <!-- Сагсны тоолуур нэмсэн -->
+  </div>
+  <div id="current-page-display">Home</div> <!-- Хуудасны нэрийг харуулах хэсэг -->
 </header>
 
 <!-- Sidebar -->
 <div id="sidebar">
   <span class="close-btn" onclick="toggleSidebar()">×</span>
   <ul>
-    <li onclick="showPage('addressPage')"><img src="assets/hayg.png" alt="Хаяг" style="width:24px; height:24px;">Хаяг</li> <!-- Хамгийн дээд хэсэгт, зурагтай хамт -->
+    <li onclick="showPage('addressPage')"><img src="assets/hayg.png" alt="Хаяг" style="width:24px; height:24px;">Хаяг</li>
     <li onclick="showPage('homePage')">Home</li>
     <li onclick="showPage('bestSellerPage')">Best Seller</li>
     <li onclick="showPage('hoodiePage')">Hoodie</li>
@@ -742,50 +793,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial render of the cart when the page loads
   renderCart();
+  updateCartCount(); // Сагсны тоог шинэчлэх
 
   // Address form submit event listener
   const addressForm = document.getElementById('addressForm');
   if (addressForm) {
+    // Local Storage-оос хаягийн мэдээллийг уншиж формыг бөглөх
+    const savedAddress = localStorage.getItem("userAddress");
+    if (savedAddress) {
+      const addressData = JSON.parse(savedAddress);
+      document.getElementById('fullName').value = addressData.fullName || '';
+      document.getElementById('phoneNumber').value = addressData.phoneNumber || '';
+      document.getElementById('province').value = addressData.province || '';
+      document.getElementById('district').value = addressData.district || '';
+      document.getElementById('khoroo').value = addressData.khoroo || '';
+      document.getElementById('street').value = addressData.street || '';
+      document.getElementById('apartment').value = addressData.apartment || '';
+    }
+
     addressForm.addEventListener('submit', async (e) => {
       e.preventDefault(); // Prevent default form submission
 
-      const fullName = document.getElementById('fullName').value;
-      const phoneNumber = document.getElementById('phoneNumber').value;
-      const province = document.getElementById('province').value;
-      const district = document.getElementById('district').value;
-      const khoroo = document.getElementById('khoroo').value;
-      const street = document.getElementById('street').value;
-      const apartment = document.getElementById('apartment').value;
+      const addressData = {
+        fullName: document.getElementById('fullName').value,
+        phoneNumber: document.getElementById('phoneNumber').value,
+        province: document.getElementById('province').value,
+        district: document.getElementById('district').value,
+        khoroo: document.getElementById('khoroo').value,
+        street: document.getElementById('street').value,
+        apartment: document.getElementById('apartment').value
+      };
 
-      if (!db) {
-        renderNotification("Алдаа: Database холбогдоогүй байна.");
-        console.error("Realtime Database is not initialized. Cannot save address.");
-        return;
-      }
-
-      try {
-        // Хаягийн мэдээллийг Firebase Realtime Database-д хадгалах
-        // Энд энгийнээр нэг хаягийг "userAddress" гэсэн нэрээр хадгалж байна.
-        // Илүү нарийн системд хэрэглэгчийн ID-гаар хадгалах нь зүйтэй.
-        await db.ref('addresses/userAddress').set({
-          fullName: fullName,
-          phoneNumber: phoneNumber,
-          province: province,
-          district: district,
-          khoroo: khoroo,
-          street: street,
-          apartment: apartment,
-          savedAt: firebase.database.ServerValue.TIMESTAMP
-        });
-
-        renderNotification("Хаяг амжилттай хадгалагдлаа!");
-        console.log("Address saved to Realtime Database.");
-        // Optionally, clear the form or redirect
-        addressForm.reset();
-      } catch (error) {
-        renderNotification("Хаяг хадгалахад алдаа гарлаа: " + error.message);
-        console.error("Error saving address to Realtime Database:", error);
-      }
+      // Хаягийн мэдээллийг Local Storage-д хадгалах
+      localStorage.setItem("userAddress", JSON.stringify(addressData));
+      renderNotification("Хаяг амжилттай хадгалагдлаа!");
+      console.log("Address saved to Local Storage.");
+      // Forms-ийг цэвэрлэхгүй, учир нь дараагийн удаа нээхэд бөглөгдсөн байх ёстой.
     });
   }
 });
@@ -799,7 +842,44 @@ function showPage(pageId) {
   if (sidebar.classList.contains('active')) {
     toggleSidebar();
   }
+  updateCurrentPageDisplay(pageId); // Хуудасны нэрийг шинэчлэх
 }
+
+// Хуудасны нэрийг харуулах функцийг шинэчлэх
+function updateCurrentPageDisplay(pageId) {
+  const displayElement = document.getElementById('current-page-display');
+  let pageName = '';
+  switch (pageId) {
+    case 'homePage':
+      pageName = 'Home';
+      break;
+    case 'addressPage':
+      pageName = 'Хаяг';
+      break;
+    case 'bestSellerPage':
+      pageName = 'Best Seller';
+      break;
+    case 'hoodiePage':
+      pageName = 'Hoodie';
+      break;
+    case 'sweaterPage':
+      pageName = 'Sweater';
+      break;
+    case 'pantsPage':
+      pageName = 'Pants';
+      break;
+    case 'accessoriesPage':
+      pageName = 'Accessories';
+      break;
+    case 'cartPage':
+      pageName = 'Сагс';
+      break;
+    default:
+      pageName = 'Home';
+  }
+  displayElement.innerText = pageName;
+}
+
 
 // Cart page
 function openCart() {
@@ -834,6 +914,18 @@ function addToCart(img, price) {
   localStorage.setItem("cart", JSON.stringify(cart));
   renderNotification("Бараа сагсанд нэмэгдлээ!");
   renderCart(); // Ensure cart is rendered after adding an item
+  updateCartCount(); // Сагсны тоог шинэчлэх
+}
+
+// Сагсны тоог шинэчлэх функц
+function updateCartCount() {
+  const cartCountElement = document.getElementById('cartCount');
+  if (cart.length > 0) {
+    cartCountElement.innerText = cart.length;
+    cartCountElement.style.display = 'block';
+  } else {
+    cartCountElement.style.display = 'none';
+  }
 }
 
 // Render cart
@@ -863,6 +955,7 @@ function deleteItem(index) {
   cart.splice(index, 1);
   localStorage.setItem("cart", JSON.stringify(cart));
   renderCart(); // Ensure cart is rendered after deleting an item
+  updateCartCount(); // Сагсны тоог шинэчлэх
 }
 
 // Notification animation
@@ -877,18 +970,13 @@ function renderNotification(msg) {
 
 // Generate unique code for Realtime Database
 async function generateUniqueCode() {
-  // Realtime Database-д давхцахгүй key үүсгэх хамгийн сайн арга бол push()-ийг ашиглах явдал юм.
-  // Энэ нь цаг хугацаанд суурилсан, давхцахгүй ID үүсгэдэг.
   if (!db) {
     console.error("Realtime Database is not initialized. Cannot generate unique code.");
     throw new Error("Realtime Database is not initialized. Please check Firebase setup.");
   }
   
-  // 'paymentCodes' гэсэн root доор шинэ child reference үүсгэнэ
   const newOrderRef = db.ref('paymentCodes').push();
-  const uniqueCode = newOrderRef.key; // Үүсгэсэн давхцахгүй key-г авна
-
-  // Realtime Database-д давхцах эсэхийг шалгах шаардлагагүй, учир нь push() нь үргэлж давхцахгүй key үүсгэдэг.
+  const uniqueCode = newOrderRef.key;
   console.log("Unique code generated (Realtime DB):", uniqueCode);
   return uniqueCode;
 }
@@ -911,11 +999,24 @@ async function openOrder(img, amount) {
       throw new Error("Failed to generate unique code.");
     }
 
-    // Realtime Database руу мэдээлэл хадгалах
+    // Local Storage-оос хаягийн мэдээллийг унших
+    const savedAddress = localStorage.getItem("userAddress");
+    let addressData = {};
+    if (savedAddress) {
+      addressData = JSON.parse(savedAddress);
+    } else {
+      renderNotification("Захиалга хийхийн өмнө хаягаа бөглөнө үү!");
+      closeCodeModal(); // Модалыг хаах
+      showPage('addressPage'); // Хаягийн хуудас руу шилжүүлэх
+      return; // Цааш үргэлжлүүлэхгүй
+    }
+
+    // Realtime Database руу мэдээлэл хадгалах (хаягийн мэдээлэлтэй хамт)
     await db.ref('paymentCodes/' + uniqueCode).set({
       image: img,
       amount: parseFloat(amount),
-      createdAt: firebase.database.ServerValue.TIMESTAMP // Сервер дээрх цагийг ашиглана
+      address: addressData, // Хаягийн мэдээллийг нэмсэн
+      createdAt: firebase.database.ServerValue.TIMESTAMP
     });
     
     codeDisplay.innerText = uniqueCode; // Display the generated code
