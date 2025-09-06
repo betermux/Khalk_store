@@ -1,1 +1,0 @@
-# Khalk_store
