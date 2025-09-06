@@ -21,19 +21,31 @@ header {
   transform: rotateY(90deg);
   animation: rotateIn 0.5s ease forwards;
   position: relative; /* For current-page-display positioning */
+  padding-bottom: 30px; /* Хуудасны нэрэнд зай гаргах */
 }
 header img.logo{width:40px;height:40px;cursor:pointer;}
 header .logo-container {
   display:flex; 
-  flex-direction: column; /* Зураг болон текстийг босоо байрлуулах */
+  flex-direction: row; /* Зураг болон "Khalk Store" текстийг нэг мөрөнд байрлуулах */
   align-items:center; 
-  gap: 2px; /* Зураг болон текстийн хоорондох зай */
+  gap: 10px; /* Зураг болон текстийн хоорондох зай */
+  position: relative; /* "Menu" текстийг байрлуулахын тулд */
 }
-header .logo-text {font-family: 'Cinzel', serif; font-size:18px; font-weight:700; color:#fff; text-transform:uppercase;}
+header .logo-text {
+  font-family: 'Cinzel', serif; 
+  font-size:14px; /* Хэмжээг багасгасан */
+  font-weight:700; 
+  color:#fff; 
+  text-transform:uppercase;
+  margin-left: -5px; /* Логотой ойртуулах */
+}
 header .menu-text { /* "Menu" текстэнд зориулсан CSS */
+  position: absolute; /* Логоны доор байрлуулах */
+  top: 40px; /* Логоны яг доор байрлуулахын тулд тохируулсан */
+  left: 20px; /* Логоны зүүн ирмэгтэй тааруулах */
   font-size: 10px; /* Жижиг хэмжээ */
   color: #ccc; /* Бүдэг өнгө */
-  margin-top: -5px; /* Зурагтай ойртуулах */
+  white-space: nowrap; /* Нэг мөрөнд байлгах */
 }
 header .cart-container { /* Сагсны дүрс болон тоолуурыг багтаах */
   position: relative;
@@ -42,24 +54,26 @@ header .cart-container { /* Сагсны дүрс болон тоолуурыг 
 header img.cart{width:28px;height:28px;}
 .cart-count { /* Сагсны тоолуурын CSS */
   position: absolute;
-  top: -5px;
-  right: -5px;
-  background-color: #ff4d4d; /* Улаан өнгө */
+  top: -4px; /* Дээшлүүлсэн (2x жижиг болгосон) */
+  right: -4px; /* Баруун тийшлүүлсэн (2x жижиг болгосон) */
+  background: linear-gradient(45deg, #ff0000, #cc0000); /* Илүү тод улаан өнгө */
   color: white;
   border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 10px;
+  padding: 0px; /* Padding-ийг багасгасан */
+  font-size: 8px; /* Хэмжээг 2x жижиг болгосон */
   font-weight: bold;
-  min-width: 18px; /* Тоо нэмэгдэхэд хэлбэрээ хадгалах */
-  text-align: center;
-  line-height: 14px; /* Босоо тэгшлэх */
+  width: 12px; /* Төгс дугуй болгохын тулд өргөн, өндрийг ижил болгосон (2x жижиг) */
+  height: 12px; /* Төгс дугуй болгохын тулд өргөн, өндрийг ижил болгосон (2x жижиг) */
+  display: flex; /* Flexbox ашиглан төвлөрүүлэх */
+  justify-content: center; /* Хэвтээ тэнхлэгт төвлөрүүлэх */
+  align-items: center; /* Босоо тэнхлэгт төвлөрүүлэх */
   display: none; /* Эхлээд нууцлагдсан байна */
 }
 
 /* Current Page Display */
 #current-page-display {
   position: absolute;
-  top: 15px; /* Header-ын доор байрлуулах */
+  bottom: 5px; /* Header-ын доод хэсэгт байрлуулах */
   left: 50%;
   transform: translateX(-50%);
   font-size: 14px;
@@ -403,8 +417,9 @@ button:focus {
 <header>
   <div class="logo-container">
     <img src="assets/khalk.png" class="logo" alt="Logo" onclick="toggleSidebar()">
-    <span class="menu-text">Menu</span> <!-- "Menu" текст нэмсэн -->
+    <span class="logo-text">Khalk Store</span> <!-- "Khalk Store" текст логоны баруун талд -->
   </div>
+  <span class="menu-text">Menu</span> <!-- "Menu" текстийг тусад нь, логоны доор байрлуулсан -->
   <div class="cart-container" onclick="openCart()"> <!-- Сагсны дүрс болон тоолуурыг багтаах div -->
     <img src="assets/cart.png" class="cart" alt="Cart">
     <span class="cart-count" id="cartCount">0</span> <!-- Сагсны тоолуур нэмсэн -->
@@ -831,6 +846,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Forms-ийг цэвэрлэхгүй, учир нь дараагийн удаа нээхэд бөглөгдсөн байх ёстой.
     });
   }
+  // Эхлэхдээ Home хуудсыг идэвхтэй болгож, нэрийг нь харуулна
+  showPage('homePage');
 });
 
 
@@ -922,7 +939,7 @@ function updateCartCount() {
   const cartCountElement = document.getElementById('cartCount');
   if (cart.length > 0) {
     cartCountElement.innerText = cart.length;
-    cartCountElement.style.display = 'block';
+    cartCountElement.style.display = 'flex'; /* Flexbox ашиглан төвлөрүүлэх */
   } else {
     cartCountElement.style.display = 'none';
   }
