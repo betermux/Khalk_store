@@ -5,41 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Khalk Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
-<!-- Firebase SDK - Updated to a stable v9.x.x version -->
-<!-- Import Firebase modules directly for v9 modular SDK -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-  import { getFirestore, collection, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
-
-  // Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyAEybA-Ou_PGkZINDT-opzVPUlrr6XOU8E",
-    authDomain: "khalkh-store.firebaseapp.com",
-    databaseURL: "https://khalkh-store-default-rtdb.firebaseio.com",
-    projectId: "khalkh-store",
-    storageBucket: "khalkh-store.firebasestorage.app",
-    messagingSenderId: "205879441792",
-    appId: "1:205879441792:web:677a6abe7912d6436a2965",
-    measurementId: "G-6M9HZM8G9N"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  getAnalytics(app); // Initialize Analytics
-
-  // Initialize Firestore and make it globally accessible
-  window.db = getFirestore(app);
-  console.log("Firebase and Firestore initialized."); // For debugging
-
-  // Initial render of the cart when the page loads
-  // This will run after the script has executed and db is initialized.
-  // Ensure renderCart is called after db is available
-  document.addEventListener('DOMContentLoaded', () => {
-    renderCart();
-  });
-
-</script>
+<!-- Firebase SDK - Reverted to v8.x.x versions -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
 <style>
 body {margin:0; padding:0; font-family:Arial,sans-serif; background:#111; color:#eee;}
 header {
@@ -639,19 +608,33 @@ button:focus {
 </div>
 
 <script>
-// Declare db globally. It will be assigned by the type="module" script.
+// Declare db globally
 let db; 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-// Wait for the DOM to be fully loaded and for the Firebase module script to execute
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAEybA-Ou_PGkZINDT-opzVPUlrr6XOU8E",
+  authDomain: "khalkh-store.firebaseapp.com",
+  databaseURL: "https://khalkh-store-default-rtdb.firebaseio.com",
+  projectId: "khalkh-store",
+  storageBucket: "khalkh-store.firebasestorage.app",
+  messagingSenderId: "205879441792",
+  appId: "1:205879441792:web:677a6abe7912d6436a2965",
+  measurementId: "G-6M9HZM8G9N"
+};
+
+// Initialize Firebase and Firestore using v8 namespaced syntax
+// Ensure this runs after the Firebase SDK scripts are loaded in the head
 document.addEventListener('DOMContentLoaded', () => {
-  // Assign the globally exposed db from the module script
-  db = window.db; 
-  if (db) {
-    console.log("Firestore instance (db) is now available.");
-  } else {
-    console.error("Firestore instance (db) is not available. Check Firebase initialization.");
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
   }
+  firebase.analytics(); // Initialize Analytics
+  db = firebase.firestore(); // Assign db here
+  console.log("Firebase and Firestore initialized (v8)."); // For debugging
+
+  // Initial render of the cart when the page loads
   renderCart();
 });
 
@@ -754,12 +737,11 @@ async function generateUniqueCode() {
     return null;
   }
 
-  // Use modular Firestore functions: collection, doc, getDoc
-  const { collection, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js");
-  const codeRef = doc(collection(db, 'paymentCodes'), code);
-  const docSnap = await getDoc(codeRef);
+  // Use v8 namespaced syntax: db.collection().doc().get()
+  const codeRef = db.collection('paymentCodes').doc(code);
+  const doc = await codeRef.get();
   
-  if (docSnap.exists()) {
+  if (doc.exists) {
     // If code exists, generate a new one recursively
     return generateUniqueCode();
   }
@@ -779,18 +761,17 @@ async function openOrder(img, amount) {
       throw new Error("Firestore is not initialized.");
     }
 
-    // Use modular Firestore functions: collection, doc, setDoc, serverTimestamp
-    const { collection, doc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js");
     const uniqueCode = await generateUniqueCode();
 
     if (!uniqueCode) {
       throw new Error("Failed to generate unique code.");
     }
 
-    await setDoc(doc(collection(db, 'paymentCodes'), uniqueCode), {
+    // Use v8 namespaced syntax: db.collection().doc().set()
+    await db.collection('paymentCodes').doc(uniqueCode).set({
       image: img,
       amount: parseFloat(amount),
-      createdAt: serverTimestamp()
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     codeDisplay.innerText = uniqueCode; // Display the generated code
     renderNotification("Захиалга амжилттай үүслээ!");
