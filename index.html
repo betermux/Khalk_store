@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Khalk Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
-<!-- Firebase SDK v8 импортууд -->
+<!-- Firebase SDK v8 импортууд - Realtime Database-ийг нэмсэн -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script> <!-- Realtime Database SDK -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
 <style>
 body {margin:0; padding:0; font-family:Arial,sans-serif; background:#111; color:#eee;}
@@ -616,7 +616,7 @@ let cart = JSON.parse(localStorage.getItem("cart")) || [];
 const firebaseConfig = {
   apiKey: "AIzaSyAEybA-Ou_PGkZINDT-opzVPUlrr6XOU8E",
   authDomain: "khalkh-store.firebaseapp.com",
-  databaseURL: "https://khalkh-store-default-rtdb.firebaseio.com",
+  databaseURL: "https://khalkh-store-default-rtdb.firebaseio.com", // Realtime Database-д чухал
   projectId: "khalkh-store",
   storageBucket: "khalkh-store.firebasestorage.app",
   messagingSenderId: "205879441792",
@@ -624,8 +624,7 @@ const firebaseConfig = {
   measurementId: "G-6M9HZM8G9N"
 };
 
-// Initialize Firebase and Firestore using v8 namespaced syntax
-// Ensure this runs after the Firebase SDK scripts are loaded in the head
+// Initialize Firebase and Realtime Database using v8 namespaced syntax
 document.addEventListener('DOMContentLoaded', () => {
   console.log("DOMContentLoaded fired. Attempting Firebase initialization...");
   if (!firebase.apps.length) {
@@ -635,8 +634,8 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("Firebase app already initialized.");
   }
   firebase.analytics(); // Initialize Analytics
-  db = firebase.firestore(); // Assign db here
-  console.log("Firestore instance (db) assigned:", db); // Check if db is an object
+  db = firebase.database(); // Realtime Database-ийг эхлүүлж байна
+  console.log("Realtime Database instance (db) assigned:", db); // Check if db is an object
 
   // Initial render of the cart when the page loads
   renderCart();
@@ -727,32 +726,25 @@ function renderNotification(msg) {
   setTimeout(() => { notify.style.display = "none"; }, 1800);
 }
 
-// Generate unique 6-character code
+// Generate unique code for Realtime Database
 async function generateUniqueCode() {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-
-  // Ensure db is available before using it
+  // Realtime Database-д давхцахгүй key үүсгэх хамгийн сайн арга бол push()-ийг ашиглах явдал юм.
+  // Энэ нь цаг хугацаанд суурилсан, давхцахгүй ID үүсгэдэг.
   if (!db) {
-    console.error("Firestore is not initialized. Cannot generate unique code.");
-    throw new Error("Firestore is not initialized. Please check Firebase setup.");
+    console.error("Realtime Database is not initialized. Cannot generate unique code.");
+    throw new Error("Realtime Database is not initialized. Please check Firebase setup.");
   }
-
-  // Use v8 namespaced syntax: db.collection().doc().get()
-  const codeRef = db.collection('paymentCodes').doc(code);
-  const doc = await codeRef.get();
   
-  if (doc.exists) {
-    // If code exists, generate a new one recursively
-    return generateUniqueCode();
-  }
-  return code;
+  // 'paymentCodes' гэсэн root доор шинэ child reference үүсгэнэ
+  const newOrderRef = db.ref('paymentCodes').push();
+  const uniqueCode = newOrderRef.key; // Үүсгэсэн давхцахгүй key-г авна
+
+  // Realtime Database-д давхцах эсэхийг шалгах шаардлагагүй, учир нь push() нь үргэлж давхцахгүй key үүсгэдэг.
+  console.log("Unique code generated (Realtime DB):", uniqueCode);
+  return uniqueCode;
 }
 
-// Save code to Firestore and show in modal
+// Save order to Realtime Database and show in modal
 async function openOrder(img, amount) {
   const modal = document.getElementById("codeModal");
   const codeDisplay = document.getElementById("paymentCode");
@@ -760,9 +752,8 @@ async function openOrder(img, amount) {
   modal.style.display = "flex"; // Show the modal
 
   try {
-    // Ensure db is available before using it
     if (!db) {
-      throw new Error("Firestore is not initialized.");
+      throw new Error("Realtime Database is not initialized.");
     }
 
     const uniqueCode = await generateUniqueCode();
@@ -771,17 +762,19 @@ async function openOrder(img, amount) {
       throw new Error("Failed to generate unique code.");
     }
 
-    // Use v8 namespaced syntax: db.collection().doc().set()
-    await db.collection('paymentCodes').doc(uniqueCode).set({
+    // Realtime Database руу мэдээлэл хадгалах
+    await db.ref('paymentCodes/' + uniqueCode).set({
       image: img,
       amount: parseFloat(amount),
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      createdAt: firebase.database.ServerValue.TIMESTAMP // Сервер дээрх цагийг ашиглана
     });
+    
     codeDisplay.innerText = uniqueCode; // Display the generated code
     renderNotification("Захиалга амжилттай үүслээ!");
+    console.log("Order saved to Realtime Database with code:", uniqueCode);
   } catch (error) {
     codeDisplay.innerText = "Алдаа гарлаа: " + error.message; // Display error message
-    console.error("Error generating or saving order code:", error);
+    console.error("Error generating or saving order code to Realtime Database:", error);
     renderNotification("Захиалга үүсгэхэд алдаа гарлаа!");
   }
 }
