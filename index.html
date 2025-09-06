@@ -627,15 +627,23 @@ const firebaseConfig = {
 // Initialize Firebase and Firestore using v8 namespaced syntax
 // Ensure this runs after the Firebase SDK scripts are loaded in the head
 document.addEventListener('DOMContentLoaded', () => {
+  console.log("DOMContentLoaded fired. Attempting Firebase initialization...");
   if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
+    console.log("Firebase app initialized.");
+  } else {
+    console.log("Firebase app already initialized.");
   }
   firebase.analytics(); // Initialize Analytics
   db = firebase.firestore(); // Assign db here
-  console.log("Firebase and Firestore initialized (v8)."); // For debugging
+  console.log("Firestore instance (db) assigned:", db); // Check if db is an object
 
   // Initial render of the cart when the page loads
-  renderCart();
+  // Use a small timeout to ensure all scripts and DOM are fully ready
+  setTimeout(() => {
+    renderCart();
+    console.log("renderCart called after a short delay.");
+  }, 100); // Small delay
 });
 
 
@@ -731,20 +739,25 @@ async function generateUniqueCode() {
     code += characters.charAt(Math.floor(Math.random() * characters.length));
   }
 
-  // Ensure db is available before using it
+  console.log("Attempting to generate unique code. Current db status:", db);
+
+  // Crucial check: Ensure db is available before using it
   if (!db) {
-    console.error("Firestore is not initialized. Cannot generate unique code.");
-    return null;
+    console.error("Firestore instance (db) is not initialized when generateUniqueCode was called.");
+    throw new Error("Firestore is not initialized. Please check Firebase setup.");
   }
 
   // Use v8 namespaced syntax: db.collection().doc().get()
   const codeRef = db.collection('paymentCodes').doc(code);
-  const doc = await codeRef.get();
-  
+  console.log("Checking if code exists:", code);
+  const doc = await codeRef.get(); // This is where the "offline" error usually occurs
+
   if (doc.exists) {
+    console.log("Code already exists, generating new one.");
     // If code exists, generate a new one recursively
     return generateUniqueCode();
   }
+  console.log("Unique code generated:", code);
   return code;
 }
 
@@ -756,9 +769,11 @@ async function openOrder(img, amount) {
   modal.style.display = "flex"; // Show the modal
 
   try {
-    // Ensure db is available before using it
+    console.log("openOrder called. Current db status:", db);
+    // Crucial check: Ensure db is available before using it
     if (!db) {
-      throw new Error("Firestore is not initialized.");
+      console.error("Firestore instance (db) is not initialized when openOrder was called.");
+      throw new Error("Firestore is not initialized. Please check Firebase setup.");
     }
 
     const uniqueCode = await generateUniqueCode();
@@ -768,6 +783,7 @@ async function openOrder(img, amount) {
     }
 
     // Use v8 namespaced syntax: db.collection().doc().set()
+    console.log("Saving order to Firestore with code:", uniqueCode);
     await db.collection('paymentCodes').doc(uniqueCode).set({
       image: img,
       amount: parseFloat(amount),
@@ -775,6 +791,7 @@ async function openOrder(img, amount) {
     });
     codeDisplay.innerText = uniqueCode; // Display the generated code
     renderNotification("Захиалга амжилттай үүслээ!");
+    console.log("Order saved successfully.");
   } catch (error) {
     codeDisplay.innerText = "Алдаа гарлаа: " + error.message; // Display error message
     console.error("Error generating or saving order code:", error);
