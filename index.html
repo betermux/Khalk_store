@@ -263,6 +263,14 @@ button:focus {
   color: #fff;
   cursor: pointer;
   transition: background 0.2s ease;
+  display: flex; /* Зургийг зэрэгцүүлэхийн тулд нэмсэн */
+  align-items: center; /* Зургийг төвлөрүүлэхийн тулд нэмсэн */
+  gap: 10px; /* Зураг болон текстийн хоорондох зайг нэмсэн */
+}
+#sidebar li img { /* Нэмэгдсэн CSS */
+  width: 24px; /* Зургийн хэмжээ */
+  height: 24px; /* Зургийн хэмжээ */
+  vertical-align: middle; /* Тексттэй зэрэгцүүлэх */
 }
 #sidebar li:hover {
   background: #ff4d4d;
@@ -286,6 +294,61 @@ button:focus {
   from {left: 0;}
   to {left: -350px;}
 }
+
+/* Address Page Styles */
+.address-form-container {
+  background: #1c1c1c;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 500px;
+  color: #eee;
+}
+.address-form-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #fff;
+}
+.address-form-container .form-group {
+  margin-bottom: 15px;
+}
+.address-form-container label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #ccc;
+}
+.address-form-container input[type="text"],
+.address-form-container input[type="tel"] {
+  width: calc(100% - 20px);
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: #222;
+  color: #fff;
+  font-size: 16px;
+}
+.address-form-container input[type="text"]:focus,
+.address-form-container input[type="tel"]:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0,123,255,0.5);
+}
+.address-form-container button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.address-form-container button[type="submit"]:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+}
 </style>
 </head>
 <body>
@@ -302,6 +365,7 @@ button:focus {
 <div id="sidebar">
   <span class="close-btn" onclick="toggleSidebar()">×</span>
   <ul>
+    <li onclick="showPage('addressPage')"><img src="assets/hayg.png" alt="Хаяг" style="width:24px; height:24px;">Хаяг</li> <!-- Хамгийн дээд хэсэгт, зурагтай хамт -->
     <li onclick="showPage('homePage')">Home</li>
     <li onclick="showPage('bestSellerPage')">Best Seller</li>
     <li onclick="showPage('hoodiePage')">Hoodie</li>
@@ -594,6 +658,45 @@ button:focus {
   <button onclick="backToShop()">⇦ Дэлгүүр рүү буцах</button>
 </div>
 
+<!-- Address Page -->
+<div id="addressPage" class="page">
+  <div class="address-form-container">
+    <img src="assets/hayg.png" alt="Хаяг" style="display: block; margin: 0 auto 20px; width: 80px;">
+    <h2>Хүргэлтийн хаяг</h2>
+    <form id="addressForm">
+      <div class="form-group">
+        <label for="fullName">Бүтэн нэр:</label>
+        <input type="text" id="fullName" required>
+      </div>
+      <div class="form-group">
+        <label for="phoneNumber">Утасны дугаар:</label>
+        <input type="tel" id="phoneNumber" required>
+      </div>
+      <div class="form-group">
+        <label for="province">Аймаг/Хот:</label>
+        <input type="text" id="province" required>
+      </div>
+      <div class="form-group">
+        <label for="district">Сум/Дүүрэг:</label>
+        <input type="text" id="district" required>
+      </div>
+      <div class="form-group">
+        <label for="khoroo">Баг/Хороо:</label>
+        <input type="text" id="khoroo" required>
+      </div>
+      <div class="form-group">
+        <label for="street">Гудамж/Байрны нэр:</label>
+        <input type="text" id="street" required>
+      </div>
+      <div class="form-group">
+        <label for="apartment">Хаалга/Орцны дугаар:</label>
+        <input type="text" id="apartment">
+      </div>
+      <button type="submit">Хаягийг хадгалах</button>
+    </form>
+  </div>
+</div>
+
 <!-- Notification -->
 <div id="notify"></div>
 
@@ -639,6 +742,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial render of the cart when the page loads
   renderCart();
+
+  // Address form submit event listener
+  const addressForm = document.getElementById('addressForm');
+  if (addressForm) {
+    addressForm.addEventListener('submit', async (e) => {
+      e.preventDefault(); // Prevent default form submission
+
+      const fullName = document.getElementById('fullName').value;
+      const phoneNumber = document.getElementById('phoneNumber').value;
+      const province = document.getElementById('province').value;
+      const district = document.getElementById('district').value;
+      const khoroo = document.getElementById('khoroo').value;
+      const street = document.getElementById('street').value;
+      const apartment = document.getElementById('apartment').value;
+
+      if (!db) {
+        renderNotification("Алдаа: Database холбогдоогүй байна.");
+        console.error("Realtime Database is not initialized. Cannot save address.");
+        return;
+      }
+
+      try {
+        // Хаягийн мэдээллийг Firebase Realtime Database-д хадгалах
+        // Энд энгийнээр нэг хаягийг "userAddress" гэсэн нэрээр хадгалж байна.
+        // Илүү нарийн системд хэрэглэгчийн ID-гаар хадгалах нь зүйтэй.
+        await db.ref('addresses/userAddress').set({
+          fullName: fullName,
+          phoneNumber: phoneNumber,
+          province: province,
+          district: district,
+          khoroo: khoroo,
+          street: street,
+          apartment: apartment,
+          savedAt: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        renderNotification("Хаяг амжилттай хадгалагдлаа!");
+        console.log("Address saved to Realtime Database.");
+        // Optionally, clear the form or redirect
+        addressForm.reset();
+      } catch (error) {
+        renderNotification("Хаяг хадгалахад алдаа гарлаа: " + error.message);
+        console.error("Error saving address to Realtime Database:", error);
+      }
+    });
+  }
 });
 
 
