@@ -1309,11 +1309,11 @@ async function checkoutSelectedItems() {
     localStorage.setItem("orderHistory", JSON.stringify(orderHistory));
     // --- End Save to Local Storage History ---
 
-    // Remove ordered items from the cart
-    cart = cart.filter(item => !item.selected);
-    localStorage.setItem("cart", JSON.stringify(cart));
-    renderCart(); // Re-render cart to reflect changes
-    updateCartCount(); // Update cart count
+    // --- ЭНДЭЭС ДООШ ЗАХИАЛСАН БАРААГ САГСНААС ХАСДАГ КОДЫГ УСТГАСАН ---
+    // cart = cart.filter(item => !item.selected);
+    // localStorage.setItem("cart", JSON.stringify(cart));
+    // renderCart(); // Re-render cart to reflect changes
+    // updateCartCount(); // Update cart count
 
   } catch (error) {
     codeDisplay.innerText = "Алдаа гарлаа: " + error.message; // Display error message
