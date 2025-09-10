@@ -47,11 +47,19 @@ header .menu-text { /* "Menu" текстэнд зориулсан CSS */
   color: #ccc; /* Бүдэг өнгө */
   white-space: nowrap; /* Нэг мөрөнд байлгах */
 }
-header .cart-container { /* Сагсны дүрс болон тоолуурыг багтаах */
+header .cart-container, header .history-container { /* Сагсны дүрс болон тоолуурыг багтаах */
   position: relative;
   cursor: pointer;
+  display: flex; /* Use flex to align icon and count */
+  align-items: center;
+  gap: 5px; /* Space between history icon and cart icon */
 }
-header img.cart{width:28px;height:28px;}
+header .right-icons {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Space between history and cart containers */
+}
+header img.cart, header img.history{width:28px;height:28px;}
 .cart-count { /* Сагсны тоолуурын CSS */
   position: absolute;
   top: -4px; /* Дээшлүүлсэн (2x жижиг болгосон) */
@@ -280,6 +288,63 @@ button:focus {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+
+/* History Page Styles */
+.history-page {
+  padding: 20px;
+}
+.history-page h2 {
+  text-align: center;
+  color: #fff;
+  margin-bottom: 20px;
+}
+.order-card {
+  background: #1c1c1c;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid #333;
+  animation: slideIn 0.5s ease forwards;
+}
+.order-card h3 {
+  color: #ff4d4d;
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+.order-card .order-item-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.order-card .order-item-list img {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid #555;
+}
+.order-card p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #ccc;
+}
+.order-card .total-amount {
+  font-weight: bold;
+  color: #fff;
+  font-size: 16px;
+  margin-top: 10px;
+  border-top: 1px solid #333;
+  padding-top: 10px;
+}
+.history-empty {
+  text-align: center;
+  margin-top: 50px;
+  color: #888;
+  font-size: 16px;
 }
 
 
@@ -539,9 +604,14 @@ button:focus {
     <span class="logo-text">Khalk Store</span> <!-- "Khalk Store" текст логоны баруун талд -->
   </div>
   <span class="menu-text">Menu</span> <!-- "Menu" текстийг тусад нь, логоны доор байрлуулсан -->
-  <div class="cart-container" onclick="openCart()"> <!-- Сагсны дүрс болон тоолуурыг багтаах div -->
-    <img src="assets/cart.png" class="cart" alt="Cart">
-    <span class="cart-count" id="cartCount">0</span> <!-- Сагсны тоолуур нэмсэн -->
+  <div class="right-icons">
+    <div class="history-container" onclick="openHistory()">
+      <img src="assets/history.png" class="history" alt="History">
+    </div>
+    <div class="cart-container" onclick="openCart()"> <!-- Сагсны дүрс болон тоолуурыг багтаах div -->
+      <img src="assets/cart.png" class="cart" alt="Cart">
+      <span class="cart-count" id="cartCount">0</span> <!-- Сагсны тоолуур нэмсэн -->
+    </div>
   </div>
   <div id="current-page-display">Home</div> <!-- Хуудасны нэрийг харуулах хэсэг -->
 </header>
@@ -557,6 +627,7 @@ button:focus {
     <li onclick="showPage('sweaterPage')">Sweater</li>
     <li onclick="showPage('pantsPage')">Pants</li>
     <li onclick="showPage('accessoriesPage')">Accessories</li>
+    <li onclick="openHistory()"><img src="assets/history.png" alt="Түүх" style="width:24px; height:24px;">Захиалгын түүх</li>
   </ul>
 </div>
 
@@ -871,6 +942,14 @@ button:focus {
   <button onclick="backToShop()">⇦ Дэлгүүр рүү буцах</button>
 </div>
 
+<!-- History Page -->
+<div id="historyPage" class="page history-page">
+  <h2>Захиалгын түүх</h2>
+  <div id="orderHistoryItems"></div>
+  <div class="history-empty" id="historyEmpty">Захиалгын түүх хоосон байна.</div>
+  <button onclick="backToShop()">⇦ Дэлгүүр рүү буцах</button>
+</div>
+
 <!-- Address Page -->
 <div id="addressPage" class="page">
   <div class="address-form-container">
@@ -930,6 +1009,9 @@ let db;
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 // Ensure all existing cart items have a 'selected' property, default to true
 cart = cart.map(item => ({ ...item, selected: item.selected !== undefined ? item.selected : true }));
+
+// Initialize order history from localStorage
+let orderHistory = JSON.parse(localStorage.getItem("orderHistory")) || [];
 
 
 // Firebase configuration - Таны өгсөн тохиргоо
@@ -1017,6 +1099,12 @@ function showPage(pageId) {
 function openCart() {
   showPage('cartPage');
   renderCart(); // Ensure cart is rendered when opened
+}
+
+// History page
+function openHistory() {
+  showPage('historyPage');
+  renderHistory(); // Render history when opened
 }
 
 function backToShop() {
@@ -1209,6 +1297,18 @@ async function checkoutSelectedItems() {
     renderNotification("Захиалга амжилттай үүслээ!");
     console.log("Batched order saved to Realtime Database with code:", uniqueCode);
 
+    // --- Save to Local Storage History ---
+    const orderToSave = {
+      orderId: uniqueCode,
+      items: itemsToOrder,
+      totalAmount: totalAmount,
+      createdAt: new Date().toISOString(), // Use ISO string for consistent date
+      status: 'pending'
+    };
+    orderHistory.push(orderToSave);
+    localStorage.setItem("orderHistory", JSON.stringify(orderHistory));
+    // --- End Save to Local Storage History ---
+
     // Remove ordered items from the cart
     cart = cart.filter(item => !item.selected);
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -1228,8 +1328,6 @@ function closeCodeModal() {
 }
 
 // Original openOrder function (for single item order from product page)
-// This function is still present in your product buttons, so it's kept for now.
-// If you only want to allow ordering from the cart, you can remove the 'Захиалах' buttons from product divs.
 async function openOrder(img, amount) {
   const modal = document.getElementById("codeModal");
   const codeDisplay = document.getElementById("paymentCode");
@@ -1278,11 +1376,66 @@ async function openOrder(img, amount) {
     codeDisplay.innerText = uniqueCode; // Display the generated code
     renderNotification("Захиалга амжилттай үүслээ!");
     console.log("Order saved to Realtime Database with code:", uniqueCode);
+
+    // --- Save to Local Storage History ---
+    const orderToSave = {
+      orderId: uniqueCode,
+      items: [{ img: img, price: `₮${amount.toLocaleString()}` }],
+      totalAmount: parseFloat(amount),
+      createdAt: new Date().toISOString(),
+      status: 'pending'
+    };
+    orderHistory.push(orderToSave);
+    localStorage.setItem("orderHistory", JSON.stringify(orderHistory));
+    // --- End Save to Local Storage History ---
+
   } catch (error) {
     codeDisplay.innerText = "Алдаа гарлаа: " + error.message; // Display error message
     console.error("Error generating or saving order code to Realtime Database:", error);
     renderNotification("Захиалга үүсгэхэд алдаа гарлаа!");
   }
+}
+
+// Render History Page
+function renderHistory() {
+  const container = document.getElementById("orderHistoryItems");
+  const empty = document.getElementById("historyEmpty");
+  container.innerHTML = "";
+
+  if (orderHistory.length === 0) {
+    empty.style.display = "block";
+    return;
+  }
+
+  empty.style.display = "none";
+
+  // Sort history by creation date, newest first
+  const sortedHistory = [...orderHistory].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  sortedHistory.forEach(order => {
+    const orderCard = document.createElement("div");
+    orderCard.className = "order-card";
+
+    const orderDate = new Date(order.createdAt).toLocaleString('mn-MN', {
+      year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+
+    let itemsHtml = '<div class="order-item-list">';
+    order.items.forEach(item => {
+      itemsHtml += `<img src="${item.img}" alt="Product Image">`;
+    });
+    itemsHtml += '</div>';
+
+    orderCard.innerHTML = `
+      <h3>Захиалгын дугаар: ${order.orderId}</h3>
+      <p>Огноо: ${orderDate}</p>
+      <p>Төлөв: ${order.status === 'pending' ? 'Хүлээгдэж байна' : order.status}</p>
+      ${itemsHtml}
+      <div class="total-amount">Нийт үнэ: ₮${order.totalAmount.toLocaleString()}</div>
+    `;
+    container.appendChild(orderCard);
+  });
 }
 </script>
 
