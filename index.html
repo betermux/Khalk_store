@@ -194,7 +194,21 @@ button:focus {
 
 /* Cart */
 .cart-page{padding:20px;}
-.cart-item{background:#1c1c1c; border-radius:12px; padding:10px; margin-bottom:10px; display:flex; align-items:center; gap:10px; position:relative; animation:slideIn 0.5s ease forwards;}
+.cart-item{
+  background:#1c1c1c; 
+  border-radius:12px; 
+  padding:10px; 
+  margin-bottom:10px; 
+  display:flex; 
+  align-items:center; 
+  gap:10px; 
+  position:relative; 
+  animation:slideIn 0.5s ease forwards;
+  border: 2px solid transparent; /* Default border */
+}
+.cart-item.selected {
+  border-color: #ff4d4d; /* Highlight selected items */
+}
 .cart-item img{width:50px;border-radius:6px;}
 .cart-empty{text-align:center;margin-top:50px;color:#888;font-size:16px;}
 .cart-item .delete-btn{
@@ -203,6 +217,71 @@ button:focus {
 }
 .cart-item:hover{border:2px solid #007bff;}
 .cart-item:hover .delete-btn{right:10px; opacity:1;}
+
+/* New styles for cart checkout */
+.cart-summary {
+  background: #1c1c1c;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 20px;
+  text-align: right;
+  color: #fff;
+}
+.cart-summary div {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+.cart-summary .total-price {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff4d4d;
+}
+.cart-summary button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(45deg, #ff4d4d, #ff1a1a);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.cart-summary button:hover {
+  background: linear-gradient(45deg, #ff1a1a, #ff4d4d);
+  transform: translateY(-2px);
+}
+
+/* Checkbox styling */
+.cart-item input[type="checkbox"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff4d4d;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  margin-right: 10px;
+  flex-shrink: 0; /* Prevent checkbox from shrinking */
+}
+
+.cart-item input[type="checkbox"]:checked {
+  background-color: #ff4d4d;
+  border-color: #ff4d4d;
+}
+
+.cart-item input[type="checkbox"]:checked::after {
+  content: '✔';
+  color: #fff;
+  font-size: 14px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 
 /* Slide in for cart items */
 @keyframes slideIn {from {opacity:0; transform:translateX(-50px);} to {opacity:1; transform:translateX(0);}}
@@ -785,6 +864,10 @@ button:focus {
 <div id="cartPage" class="page cart-page">
   <div id="cartItems"></div>
   <div class="cart-empty" id="cartEmpty">Сагс хоосон байна</div>
+  <div id="cartSummary" class="cart-summary" style="display: none;">
+    <div>Нийт үнэ: <span id="selectedTotalPrice">₮0</span></div>
+    <button onclick="checkoutSelectedItems()">Сонгосон барааг захиалах</button>
+  </div>
   <button onclick="backToShop()">⇦ Дэлгүүр рүү буцах</button>
 </div>
 
@@ -843,7 +926,11 @@ button:focus {
 <script>
 // Declare db globally
 let db; 
+// Initialize cart with 'selected' property
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
+// Ensure all existing cart items have a 'selected' property, default to true
+cart = cart.map(item => ({ ...item, selected: item.selected !== undefined ? item.selected : true }));
+
 
 // Firebase configuration - Таны өгсөн тохиргоо
 const firebaseConfig = {
@@ -926,46 +1013,6 @@ function showPage(pageId) {
   // updateBannerTitle(pageId); // Баннерны нэрийг шинэчлэх - одоо HTML дотор шууд байгаа тул хэрэггүй
 }
 
-// Баннерны нэрийг шинэчлэх функц (Одоо HTML дотор шууд байгаа тул энэ функц хэрэггүй болсон)
-/*
-function updateBannerTitle(pageId) {
-  const bannerTitleElement = document.querySelector(`#${pageId} .banner h1`);
-  if (bannerTitleElement) {
-    let title = '';
-    switch (pageId) {
-      case 'homePage':
-        title = 'Home';
-        break;
-      case 'bestSellerPage':
-        title = 'Best Seller';
-        break;
-      case 'hoodiePage':
-        title = 'Hoodie';
-        break;
-      case 'sweaterPage':
-        title = 'Sweater';
-        break;
-      case 'pantsPage':
-        title = 'Pants';
-        break;
-      case 'accessoriesPage':
-        title = 'Accessories';
-        break;
-      case 'cartPage':
-        title = 'Сагс'; // Сагсны хуудас баннергүй байж болно, гэхдээ нэр нь хэрэгтэй бол
-        break;
-      case 'addressPage':
-        title = 'Хаяг'; // Хаягийн хуудас баннергүй байж болно, гэхдээ нэр нь хэрэгтэй бол
-        break;
-      default:
-        title = '';
-    }
-    bannerTitleElement.innerText = title;
-  }
-}
-*/
-
-
 // Cart page
 function openCart() {
   showPage('cartPage');
@@ -994,8 +1041,8 @@ function addToCart(img, price) {
   productEl.style.transform = 'scale(1.05)';
   setTimeout(() => { productEl.style.transform = 'scale(1)'; }, 300);
 
-  // Барааг сагсанд нэмэх
-  cart.push({ img, price });
+  // Барааг сагсанд нэмэх, selected: true-ээр эхлүүлнэ
+  cart.push({ img, price, selected: true }); 
   localStorage.setItem("cart", JSON.stringify(cart));
   renderNotification("Бараа сагсанд нэмэгдлээ!");
   renderCart(); // Ensure cart is rendered after adding an item
@@ -1017,23 +1064,55 @@ function updateCartCount() {
 function renderCart() {
   const container = document.getElementById("cartItems");
   const empty = document.getElementById("cartEmpty");
+  const cartSummary = document.getElementById("cartSummary");
   container.innerHTML = "";
 
   if (cart.length === 0) {
     empty.style.display = "block";
+    cartSummary.style.display = "none";
     return;
   }
 
-empty.style.display = "none";
+  empty.style.display = "none";
+  cartSummary.style.display = "block";
 
   cart.forEach((item, index) => {
     const div = document.createElement("div");
-    div.className = "cart-item";
-    div.innerHTML = `<img src="${item.img}"><div>${item.price}</div>
-    <img src="assets/delete.png" class="delete-btn" onclick="deleteItem(${index})">`;
+    div.className = `cart-item ${item.selected ? 'selected' : ''}`;
+    div.innerHTML = `
+      <input type="checkbox" id="item-${index}" ${item.selected ? 'checked' : ''} onchange="toggleCartItemSelection(${index})">
+      <img src="${item.img}">
+      <div>${item.price}</div>
+      <img src="assets/delete.png" class="delete-btn" onclick="deleteItem(${index})">
+    `;
     container.appendChild(div);
   });
+  updateSelectedTotalPrice();
 }
+
+// Toggle cart item selection
+function toggleCartItemSelection(index) {
+  cart[index].selected = !cart[index].selected;
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCart(); // Re-render to update styles and total price
+}
+
+// Update total price of selected items
+function updateSelectedTotalPrice() {
+  const selectedTotalPriceElement = document.getElementById('selectedTotalPrice');
+  let total = 0;
+  cart.forEach(item => {
+    if (item.selected) {
+      // Extract numeric value from price string (e.g., "₮121,000" -> 121000)
+      const priceValue = parseFloat(item.price.replace('₮', '').replace(/,/g, ''));
+      if (!isNaN(priceValue)) {
+        total += priceValue;
+      }
+    }
+  });
+  selectedTotalPriceElement.innerText = `₮${total.toLocaleString()}`; // Format back to currency
+}
+
 
 // Delete item
 function deleteItem(index) {
@@ -1060,13 +1139,97 @@ async function generateUniqueCode() {
     throw new Error("Realtime Database is not initialized. Please check Firebase setup.");
   }
   
-  const newOrderRef = db.ref('paymentCodes').push();
+  const newOrderRef = db.ref('orders').push(); // Changed path to 'orders'
   const uniqueCode = newOrderRef.key;
   console.log("Unique code generated (Realtime DB):", uniqueCode);
   return uniqueCode;
 }
 
-// Save order to Realtime Database and show in modal
+// Checkout selected items
+async function checkoutSelectedItems() {
+  const selectedItems = cart.filter(item => item.selected);
+
+  if (selectedItems.length === 0) {
+    renderNotification("Захиалах бараа сонгоно уу!");
+    return;
+  }
+
+  const savedAddress = localStorage.getItem("userAddress");
+  let addressData = {};
+  if (savedAddress) {
+    addressData = JSON.parse(savedAddress);
+    // Check if essential address fields are filled
+    if (!addressData.fullName || !addressData.phoneNumber || !addressData.province || !addressData.district || !addressData.khoroo || !addressData.street) {
+      renderNotification("Захиалга хийхийн өмнө хаягийн мэдээллээ бүрэн бөглөнө үү!");
+      showPage('addressPage');
+      return;
+    }
+  } else {
+    renderNotification("Захиалга хийхийн өмнө хаягаа бөглөнө үү!");
+    showPage('addressPage');
+    return;
+  }
+
+  const modal = document.getElementById("codeModal");
+  const codeDisplay = document.getElementById("paymentCode");
+  codeDisplay.innerText = "Кодыг үүсгэж байна..."; // Show loading message
+  modal.style.display = "flex"; // Show the modal
+
+  try {
+    if (!db) {
+      throw new Error("Realtime Database is not initialized.");
+    }
+
+    const uniqueCode = await generateUniqueCode();
+
+    if (!uniqueCode) {
+      throw new Error("Failed to generate unique code.");
+    }
+
+    // Calculate total amount for selected items
+    let totalAmount = 0;
+    const itemsToOrder = selectedItems.map(item => {
+      const priceValue = parseFloat(item.price.replace('₮', '').replace(/,/g, ''));
+      if (!isNaN(priceValue)) {
+        totalAmount += priceValue;
+      }
+      return { img: item.img, price: item.price }; // Only include necessary info for order
+    });
+
+    // Save the batched order to Realtime Database
+    await db.ref('orders/' + uniqueCode).set({
+      items: itemsToOrder,
+      totalAmount: totalAmount,
+      address: addressData,
+      createdAt: firebase.database.ServerValue.TIMESTAMP,
+      status: 'pending' // Add a status for tracking orders
+    });
+    
+    codeDisplay.innerText = uniqueCode; // Display the generated code
+    renderNotification("Захиалга амжилттай үүслээ!");
+    console.log("Batched order saved to Realtime Database with code:", uniqueCode);
+
+    // Remove ordered items from the cart
+    cart = cart.filter(item => !item.selected);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart(); // Re-render cart to reflect changes
+    updateCartCount(); // Update cart count
+
+  } catch (error) {
+    codeDisplay.innerText = "Алдаа гарлаа: " + error.message; // Display error message
+    console.error("Error generating or saving batched order to Realtime Database:", error);
+    renderNotification("Захиалга үүсгэхэд алдаа гарлаа!");
+  }
+}
+
+// Close code modal
+function closeCodeModal() {
+  document.getElementById("codeModal").style.display = "none";
+}
+
+// Original openOrder function (for single item order from product page)
+// This function is still present in your product buttons, so it's kept for now.
+// If you only want to allow ordering from the cart, you can remove the 'Захиалах' buttons from product divs.
 async function openOrder(img, amount) {
   const modal = document.getElementById("codeModal");
   const codeDisplay = document.getElementById("paymentCode");
@@ -1089,6 +1252,13 @@ async function openOrder(img, amount) {
     let addressData = {};
     if (savedAddress) {
       addressData = JSON.parse(savedAddress);
+      // Check if essential address fields are filled
+      if (!addressData.fullName || !addressData.phoneNumber || !addressData.province || !addressData.district || !addressData.khoroo || !addressData.street) {
+        renderNotification("Захиалга хийхийн өмнө хаягийн мэдээллээ бүрэн бөглөнө үү!");
+        closeCodeModal(); // Модалыг хаах
+        showPage('addressPage'); // Хаягийн хуудас руу шилжүүлэх
+        return; // Цааш үргэлжлүүлэхгүй
+      }
     } else {
       renderNotification("Захиалга хийхийн өмнө хаягаа бөглөнө үү!");
       closeCodeModal(); // Модалыг хаах
@@ -1097,11 +1267,12 @@ async function openOrder(img, amount) {
     }
 
     // Realtime Database руу мэдээлэл хадгалах (хаягийн мэдээлэлтэй хамт)
-    await db.ref('paymentCodes/' + uniqueCode).set({
-      image: img,
-      amount: parseFloat(amount),
+    await db.ref('orders/' + uniqueCode).set({ // Changed path to 'orders'
+      items: [{ img: img, price: `₮${amount.toLocaleString()}` }], // Wrap single item in an array
+      totalAmount: parseFloat(amount),
       address: addressData, // Хаягийн мэдээллийг нэмсэн
-      createdAt: firebase.database.ServerValue.TIMESTAMP
+      createdAt: firebase.database.ServerValue.TIMESTAMP,
+      status: 'pending'
     });
     
     codeDisplay.innerText = uniqueCode; // Display the generated code
@@ -1112,11 +1283,6 @@ async function openOrder(img, amount) {
     console.error("Error generating or saving order code to Realtime Database:", error);
     renderNotification("Захиалга үүсгэхэд алдаа гарлаа!");
   }
-}
-
-// Close code modal
-function closeCodeModal() {
-  document.getElementById("codeModal").style.display = "none";
 }
 </script>
 
